@@ -176,7 +176,7 @@ def run_training(args):
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
         losses.update(loss.item(), input.size(0))
-        top1.update(prec1[0], input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
 
         # compute gradient and do SGD step
@@ -256,7 +256,7 @@ def validate(args, test_loader, model, criterion):
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1[0], input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
         losses.update(loss.item(), input.size(0))
         batch_time.update(time.time() - end)
