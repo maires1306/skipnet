@@ -284,12 +284,12 @@ def train(args, train_loader, model, criterion,
 
         # measure accuracy and record loss
         prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.item(), input.size(0))
         total_rewards.update(torch.cat(list(itertools.chain.from_iterable(
-            cum_rewards.values()))).mean().data[0],
+            cum_rewards.values()))).mean().item(),
                              input.size(0))
         total_gate_rewards = torch.cat(list(itertools.chain.from_iterable(
-            rewards.values()))).sum().data[0]
+            rewards.values()))).sum().item()
         top1.update(prec1[0], input.size(0))
         top5.update(prec5[0], input.size(0))
         skip_ratios.update(skips, input.size(0))
@@ -397,7 +397,7 @@ def validate(args, val_loader, model, criterion, epoch):
         top1.update(prec1[0], input.size(0))
         top5.update(prec5[0], input.size(0))
         skip_ratios.update(skips, input.size(0))
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.item(), input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
 

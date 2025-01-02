@@ -251,8 +251,8 @@ def run_training(args, tune_config={}, reporter=None):
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
         total_rewards.update(cum_rewards[0].mean(), input.size(0))
-        total_losses.update(total_loss.mean().data[0], input.size(0))
-        losses.update(pred_loss.mean().data[0], input.size(0))
+        total_losses.update(total_loss.mean().item(), input.size(0))
+        losses.update(pred_loss.mean().item(), input.size(0))
         top1.update(prec1[0], input.size(0))
         skip_ratios.update(skips, input.size(0))
         total_gate_reward = sum([r.mean() for r in gate_rewards])
