@@ -147,7 +147,7 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.squeeze().long().cuda(async=True)
+        target = target.squeeze().long().cuda(non_blocking=True)
         input_var = Variable(input)
         target_var = Variable(target)
 
@@ -213,7 +213,7 @@ def validate(args, test_loader, model, criterion):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.squeeze().long().cuda(async=True)
+        target = target.squeeze().long().cuda(non_blocking=True)
         input_var = Variable(input, volatile=True)
         target_var = Variable(target, volatile=True)
 

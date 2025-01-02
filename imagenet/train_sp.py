@@ -201,7 +201,7 @@ def train(args, train_loader, model, criterion, optimizer, epoch):
         data_time.update(time.time() - end)
 
         input = input.cuda()
-        target = target.cuda(async=True)
+        target = target.cuda(non_blocking=True)
         input_var = Variable(input)
         target_var = Variable(target)
 
@@ -309,7 +309,7 @@ def validate(args, val_loader, model, criterion, epoch):
 
     end = time.time()
     for i, (input, target) in enumerate(val_loader):
-        target = target.cuda(async=True)
+        target = target.cuda(non_blocking=True)
         input_var = Variable(input, volatile=True)
         target_var = Variable(target, volatile=True)
 
