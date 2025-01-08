@@ -541,7 +541,7 @@ class RecurrentGatedRLResNet(nn.Module):
         self.avgpool = nn.AvgPool2d(7)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
         # save everything
         self.saved_actions = {}
@@ -645,7 +645,7 @@ class RecurrentGatedRLResNet(nn.Module):
         x = self.fc(x)
 
         if reinforce:
-            softmax = self.softmax(x)
+            softmax = self.softmax(x, dim=1)
             # action = softmax.multinomial()
             dist = Categorical(softmax)
             action = dist.sample()
