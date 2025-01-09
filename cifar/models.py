@@ -855,6 +855,8 @@ class RLFeedforwardGateI(nn.Module):
             self.saved_action = action
 
         action = action.view(action.size(0), 1, 1, 1).float()
+        print("FFGate-I Action (raw):", action)
+        print("Action stats - Min:", action.min(), "Max:", action.max(), "Mean:", action.mean())
         return action, softmax
 
 
@@ -896,6 +898,8 @@ class RLFeedforwardGateII(nn.Module):
             self.saved_action = action
 
         action = action.view(action.size(0), 1, 1, 1).float()
+        print("FFGate-II Action (raw):", action)
+        print("Action stats - Min:", action.min(), "Max:", action.max(), "Mean:", action.mean())
         return action, softmax
 
 
