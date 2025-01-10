@@ -998,6 +998,10 @@ class ResNetFeedForwardRL(nn.Module):
         x = self.bn1(x)
         x = self.relu(x)
 
+        # Debug initial output
+        print("[DEBUG] After conv1+bn1+relu, x stats - Min:", x.min(), "Max:", x.max(), "Mean:", x.mean())
+
+
         masks = []
         gprobs = []
         # must pass through the first layer in first group
@@ -1007,6 +1011,9 @@ class ResNetFeedForwardRL(nn.Module):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
+
+        # Debug intermediate gate probabilities
+        print("[DEBUG] Group 1 Gate 0 gprob:", gprob)
 
         for g in range(3):
             for i in range(0 + int(g == 0), self.num_layers[g]):
@@ -1026,11 +1033,24 @@ class ResNetFeedForwardRL(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        print("[ResNetFeedForwardRL] here")
+        print("[DEBUG] Output of fully connected layer:", x)
 
-        # collect all actions
-        for inst in self.gate_instances:
-            self.saved_actions.append(inst.saved_action)
+        # Collect all actions
+        for idx, inst in enumerate(self.gate_instances):
+            saved_action = inst.saved_action
+
+            # Debug saved action tensor
+            print(f"[DEBUG] Gate Instance {idx} Saved Action Tensor:", saved_action)
+            print(f"[DEBUG] Action stats - Min: {saved_action.min()}, Max: {saved_action.max()}, Mean: {saved_action.mean()}")
+            
+            # Validate tensor
+            if torch.isnan(saved_action).any():
+                print(f"[ERROR] NaN detected in Gate Instance {idx} Saved Action!")
+            if torch.isinf(saved_action).any():
+                print(f"[ERROR] Infinite values detected in Gate Instance {idx} Saved Action!")
+
+            self.saved_actions.append(saved_action)
+
 
         if reinforce:  # for pure RL
             softmax = self.softmax(x, dim=1)
