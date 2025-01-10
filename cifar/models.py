@@ -1026,6 +1026,8 @@ class ResNetFeedForwardRL(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
+        print("[ResNetFeedForwardRL] here")
+
         # collect all actions
         for inst in self.gate_instances:
             self.saved_actions.append(inst.saved_action)
