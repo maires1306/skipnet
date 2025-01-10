@@ -1039,18 +1039,20 @@ class ResNetFeedForwardRL(nn.Module):
         for idx, inst in enumerate(self.gate_instances):
             saved_action = inst.saved_action
 
+            # Convert to float for stats calculations
+            saved_action_float = saved_action.float()
+
             # Debug saved action tensor
             print(f"[DEBUG] Gate Instance {idx} Saved Action Tensor:", saved_action)
-            print(f"[DEBUG] Action stats - Min: {saved_action.min()}, Max: {saved_action.max()}, Mean: {saved_action.mean()}")
-            
+            print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}, Mean: {saved_action_float.mean()}")
+
             # Validate tensor
-            if torch.isnan(saved_action).any():
+            if torch.isnan(saved_action_float).any():
                 print(f"[ERROR] NaN detected in Gate Instance {idx} Saved Action!")
-            if torch.isinf(saved_action).any():
+            if torch.isinf(saved_action_float).any():
                 print(f"[ERROR] Infinite values detected in Gate Instance {idx} Saved Action!")
 
             self.saved_actions.append(saved_action)
-
 
         if reinforce:  # for pure RL
             softmax = self.softmax(x, dim=1)
