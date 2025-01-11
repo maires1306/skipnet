@@ -848,10 +848,14 @@ class RLFeedforwardGateI(nn.Module):
         softmax = self.prob_layer(x)
 
         if self.training:
+            print("[DEBUG] self.training")
             action = softmax.multinomial(num_samples=1)
+            print(action)
             self.saved_action = action
         else:
+            print("[DEBUG] not self.training")
             action = (softmax[:, 1] > 0.5).float()
+            print(action)
             self.saved_action = action
 
         action = action.view(action.size(0), 1, 1, 1).float()
@@ -999,8 +1003,7 @@ class ResNetFeedForwardRL(nn.Module):
         x = self.relu(x)
 
         # Debug initial output
-        print("[DEBUG] After conv1+bn1+relu, x stats - Min:", x.min(), "Max:", x.max(), "Mean:", x.mean())
-
+        print("[DEBUG] After conv1+bn1+relu, x stats - Min:", x.min(), "Max:", x.max())
 
         masks = []
         gprobs = []
@@ -1011,9 +1014,6 @@ class ResNetFeedForwardRL(nn.Module):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
-
-        # Debug intermediate gate probabilities
-        print("[DEBUG] Group 1 Gate 0 gprob:", gprob)
 
         for g in range(3):
             for i in range(0 + int(g == 0), self.num_layers[g]):
@@ -1044,7 +1044,7 @@ class ResNetFeedForwardRL(nn.Module):
 
             # Debug saved action tensor
             print(f"[DEBUG] Gate Instance {idx} Saved Action Tensor:", saved_action)
-            print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}, Mean: {saved_action_float.mean()}")
+            print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}")
 
             # Validate tensor
             if torch.isnan(saved_action_float).any():
