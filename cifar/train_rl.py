@@ -238,23 +238,30 @@ def run_training(args, tune_config={}, reporter=None):
         # apply REINFORCE to each gate
         # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            # Ensure action is float for softmax, if needed
-            if action.dim() > 1:  # If action is logits/probabilities
-                action = action.float()  # Convert to float
-                action_probs = torch.softmax(action, dim=-1)  # Normalize logits to probabilities
-            else:  # If action is already sampled indices
-                action_probs = action.float()  # Convert to float, assume probabilities already provided
+            if action.dim() > 1:
+                action = action.float()
+                action_probs = torch.softmax(action, dim=-1)
+            else:
+                action_probs = action.float()  # Assume already probabilities
 
             # Create Categorical distribution
             m = torch.distributions.Categorical(probs=action_probs)
 
-            # Compute log_prob for the sampled action
+            # Compute log_prob for sampled actions
             sampled_action = action.argmax(dim=-1) if action.dim() > 1 else action
             log_prob = m.log_prob(sampled_action)
 
+            # Ensure R is a tensor and on the correct device
+            R = torch.tensor(R, dtype=torch.float32, requires_grad=False).to(action.device)
+
             # Compute REINFORCE loss
             loss = -log_prob * args.rl_weight * R
-            loss.backward(retain_graph=True)
+
+            # Debug loss
+            print("[DEBUG] Loss requires_grad:", loss.requires_grad)
+
+            # Perform backward pass
+            loss.mean().backward(retain_graph=True)  # Use mean to collapse to scalar
 
         total_loss = total_criterion(output, target_var)
 
