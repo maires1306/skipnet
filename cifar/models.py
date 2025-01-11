@@ -192,8 +192,8 @@ class FeedforwardGateI(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
-        self.logprob = nn.LogSoftmax(dim=1)
+        self.prob_layer = nn.Softmax(dim=0)
+        self.logprob = nn.LogSoftmax(dim=0)
 
     def forward(self, x):
         x = self.maxpool(x)
@@ -827,7 +827,7 @@ class RLFeedforwardGateI(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
+        self.prob_layer = nn.Softmax(dim=0)
 
         # saved actions and rewards
         self.saved_action = []
@@ -927,7 +927,7 @@ class ResNetFeedForwardRL(nn.Module):
         self.avgpool = nn.AvgPool2d(8)
         self.fc = nn.Linear(64 * block.expansion, num_classes)
 
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = nn.Softmax(dim=0)
         self.saved_actions = []
         self.rewards = []
 
