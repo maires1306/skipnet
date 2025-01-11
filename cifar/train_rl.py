@@ -235,15 +235,17 @@ def run_training(args, tune_config={}, reporter=None):
             R = r + args.gamma * R
             cum_rewards.insert(0, R)
 
-        # apply REINFORCE to each gate
-        total_reinforce_loss = 0
+        # Apply REINFORCE to each gate
         for action, R in zip(gate_saved_actions, cum_rewards):
-            action_probs = torch.softmax(action.float(), dim=-1) if action.dim() > 1 else action.float()
-            m = torch.distributions.Categorical(probs=action_probs)
+            # Convert action to appropriate probabilities
+            probs = torch.cat([1 - action.float(), action.float()], dim=1)  # Assuming binary actions
+            m = torch.distributions.Categorical(probs=probs)
 
-            # Compute log probabilities and loss
-            log_prob = m.log_prob(action)
-            reinforce_loss = -log_prob * args.rl_weight * R.detach()  # Reinforcement loss
+            # Compute log probability
+            log_prob = m.log_prob(action.squeeze(-1))  # Ensure proper dimensions
+            reinforce_loss = -log_prob * (args.rl_weight * R.detach())  # Compute REINFORCE loss
+
+            # Accumulate loss
             total_reinforce_loss += reinforce_loss.mean()
 
         # Compute total loss
