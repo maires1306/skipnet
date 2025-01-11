@@ -1041,9 +1041,7 @@ class ResNetFeedForwardRL(nn.Module):
 
             # Convert to float for stats calculations
             saved_action_float = saved_action.float()
-
-            # Debug saved action tensor
-            print(f"[DEBUG] Gate Instance {idx} Saved Action Tensor:", saved_action)
+            
             print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}")
 
             # Validate tensor

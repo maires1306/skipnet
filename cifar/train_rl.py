@@ -238,12 +238,8 @@ def run_training(args, tune_config={}, reporter=None):
         # apply REINFORCE to each gate
         # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            action = torch.nan_to_num(action, nan=0.0)  # Replace NaNs
-            action = action / action.sum(dim=-1, keepdim=True)  # Normalize
-            action = torch.clamp(action, min=1e-8, max=1.0)  # Avoid extreme values
-
-            print("Normalized Action Tensor:", action)
-            print("Action stats - Min:", action.min(), "Max:", action.max(), "Sum:", action.sum(dim=-1))
+            print("[train_rl.py] Action Tensor:", action)
+            print("[train_rl.py] Action stats - Min:", action.min(), "Max:", action.max(), "Sum:", action.sum(dim=-1))
 
             m = torch.distributions.Categorical(probs=action)
             loss = -m.log_prob(action) * args.rl_weight * R
