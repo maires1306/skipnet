@@ -523,11 +523,15 @@ def cifar100_feedforward_110(pretrained=False, **kwargs):
 
 # For Recurrent Gate
 def repackage_hidden(h):
-    """ to reduce memory usage"""
-    if type(h) == Variable:
+    """Wraps hidden states in new Variables to detach them from their history."""
+    if isinstance(h, Variable):  # For backward compatibility with Variable
         return Variable(h.data)
-    else:
+    elif isinstance(h, torch.Tensor):  # If it's a single tensor, detach it
+        return h.detach()
+    elif isinstance(h, (tuple, list)):  # If it's iterable, process recursively
         return tuple(repackage_hidden(v) for v in h)
+    else:
+        raise TypeError(f"Unsupported type for hidden state: {type(h)}")
 
 
 class RNNGate(nn.Module):
