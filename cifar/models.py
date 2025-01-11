@@ -848,14 +848,10 @@ class RLFeedforwardGateI(nn.Module):
         softmax = self.prob_layer(x)
 
         if self.training:
-            print("[DEBUG] self.training")
             action = softmax.multinomial(num_samples=1)
-            print(action)
             self.saved_action = action
         else:
-            print("[DEBUG] not self.training")
             action = (softmax[:, 1] > 0.5).float()
-            print(action)
             self.saved_action = action
 
         action = action.view(action.size(0), 1, 1, 1).float()
@@ -1041,7 +1037,7 @@ class ResNetFeedForwardRL(nn.Module):
 
             # Convert to float for stats calculations
             saved_action_float = saved_action.float()
-            
+
             print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}")
 
             # Validate tensor
