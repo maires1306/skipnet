@@ -238,7 +238,7 @@ def run_training(args, tune_config={}, reporter=None):
         # apply REINFORCE to each gate
         # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            print("[train_rl] action dim=0 {action}")
+            print(f"[train_rl] action dim=0 {action}")
             m = torch.distributions.Categorical(probs=action)
             loss = -m.log_prob(action) * args.rl_weight * R
             loss.backward(retain_graph=True)
