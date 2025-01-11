@@ -998,9 +998,6 @@ class ResNetFeedForwardRL(nn.Module):
         x = self.bn1(x)
         x = self.relu(x)
 
-        # Debug initial output
-        print("[DEBUG] After conv1+bn1+relu, x stats - Min:", x.min(), "Max:", x.max())
-
         masks = []
         gprobs = []
         # must pass through the first layer in first group
@@ -1029,23 +1026,9 @@ class ResNetFeedForwardRL(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        print("[DEBUG] Output of fully connected layer:", x)
-
         # Collect all actions
         for idx, inst in enumerate(self.gate_instances):
             saved_action = inst.saved_action
-
-            # Convert to float for stats calculations
-            saved_action_float = saved_action.float()
-
-            print(f"[DEBUG] Action stats - Min: {saved_action_float.min()}, Max: {saved_action_float.max()}")
-
-            # Validate tensor
-            if torch.isnan(saved_action_float).any():
-                print(f"[ERROR] NaN detected in Gate Instance {idx} Saved Action!")
-            if torch.isinf(saved_action_float).any():
-                print(f"[ERROR] Infinite values detected in Gate Instance {idx} Saved Action!")
-
             self.saved_actions.append(saved_action)
 
         if reinforce:  # for pure RL
