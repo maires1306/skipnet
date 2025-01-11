@@ -241,8 +241,18 @@ def run_training(args, tune_config={}, reporter=None):
             print("[train_rl.py] Action Tensor:", action)
             print("[train_rl.py] Action stats - Min:", action.min(), "Max:", action.max(), "Sum:", action.sum(dim=-1))
 
-            m = torch.distributions.Categorical(probs=action)
-            loss = -m.log_prob(action) * args.rl_weight * R
+            # Ensure action represents probabilities if needed
+            action_probs = torch.softmax(action, dim=-1) if action.dim() > 1 else action
+
+            # Create Categorical distribution
+            m = torch.distributions.Categorical(probs=action_probs)
+
+            # Compute log_prob for the sampled action
+            sampled_action = action.argmax(dim=-1)  # Or ensure action contains indices
+            log_prob = m.log_prob(sampled_action)
+
+            # Compute REINFORCE loss
+            loss = -log_prob * args.rl_weight * R
             loss.backward(retain_graph=True)
 
         total_loss = total_criterion(output, target_var)
