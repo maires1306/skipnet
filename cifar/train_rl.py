@@ -236,6 +236,7 @@ def run_training(args, tune_config={}, reporter=None):
             cum_rewards.insert(0, R)
 
         # Apply REINFORCE to each gate
+        total_reinforce_loss = 0
         for action, R in zip(gate_saved_actions, cum_rewards):
             # Convert action to appropriate probabilities
             probs = torch.cat([1 - action.float(), action.float()], dim=1)  # Assuming binary actions
