@@ -209,7 +209,7 @@ def run_training(args, tune_config={}, reporter=None):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(non_blocking=False)
+        target = target.cuda(non_blocking=True)
         input_var = Variable(input).cuda()
         target_var = Variable(target).cuda()
 
@@ -227,27 +227,30 @@ def run_training(args, tune_config={}, reporter=None):
         # intermediate rewards for each gate
         for act in gate_saved_actions:
             gate_rewards.append((1 - act.float()).data * normalized_alpha)
-        # pdb.set_trace()
+        
         # collect cumulative future rewards
-        R = - pred_loss.data
+        R = -pred_loss.data
         cum_rewards = []
         for r in gate_rewards[::-1]:
             R = r + args.gamma * R
             cum_rewards.insert(0, R)
 
         # apply REINFORCE to each gate
-        # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
+        total_reinforce_loss = 0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            print(f"[train_rl] action dim=0 {action}")
-            m = torch.distributions.Categorical(probs=action)
-            loss = -m.log_prob(action) * args.rl_weight * R
-            loss.backward(retain_graph=True)
+            action_probs = torch.softmax(action.float(), dim=-1) if action.dim() > 1 else action.float()
+            m = torch.distributions.Categorical(probs=action_probs)
 
-        total_loss = total_criterion(output, target_var)
+            # Compute log probabilities and loss
+            log_prob = m.log_prob(action)
+            reinforce_loss = -log_prob * args.rl_weight * R.detach()  # Reinforcement loss
+            total_reinforce_loss += reinforce_loss.mean()
+
+        # Compute total loss
+        total_loss = total_criterion(output, target_var) + total_reinforce_loss
 
         optimizer.zero_grad()
-        # optimize hybrid loss
-        torch.autograd.backward(gate_saved_actions + [total_loss])
+        total_loss.backward(retain_graph=True)
         optimizer.step()
 
         # measure accuracy and record loss
@@ -267,7 +270,8 @@ def run_training(args, tune_config={}, reporter=None):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if reporter: reporter(timesteps_total=i, neg_mean_loss=losses.val)
+        if reporter:
+            reporter(timesteps_total=i, neg_mean_loss=losses.val)
         # print log
         if i % args.print_freq == 0 or i == (args.iters - 1):
             logging.info("Iter: [{0}/{1}]\t"
@@ -314,6 +318,7 @@ def run_training(args, tune_config={}, reporter=None):
             shutil.copyfile(checkpoint_path, os.path.join(args.save_path,
                                                           'checkpoint_latest'
                                                           '.pth.tar'))
+
 
 
 def validate(args, test_loader, model):

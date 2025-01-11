@@ -159,7 +159,7 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(non_blocking=False)
+        target = target.cuda(non_blocking=True)
         input_var = Variable(input).cuda()
         target_var = Variable(target).cuda()
 
