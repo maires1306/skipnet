@@ -238,17 +238,18 @@ def run_training(args, tune_config={}, reporter=None):
         # apply REINFORCE to each gate
         # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            print("[train_rl.py] Action Tensor:", action)
-            print("[train_rl.py] Action stats - Min:", action.min(), "Max:", action.max(), "Sum:", action.sum(dim=-1))
-
-            # Ensure action represents probabilities if needed
-            action_probs = torch.softmax(action, dim=-1) if action.dim() > 1 else action
+            # Ensure action is float for softmax, if needed
+            if action.dim() > 1:  # If action is logits/probabilities
+                action = action.float()  # Convert to float
+                action_probs = torch.softmax(action, dim=-1)  # Normalize logits to probabilities
+            else:  # If action is already sampled indices
+                action_probs = action.float()  # Convert to float, assume probabilities already provided
 
             # Create Categorical distribution
             m = torch.distributions.Categorical(probs=action_probs)
 
             # Compute log_prob for the sampled action
-            sampled_action = action.argmax(dim=-1)  # Or ensure action contains indices
+            sampled_action = action.argmax(dim=-1) if action.dim() > 1 else action
             log_prob = m.log_prob(sampled_action)
 
             # Compute REINFORCE loss
