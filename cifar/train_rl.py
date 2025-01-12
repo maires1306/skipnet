@@ -29,7 +29,7 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x, dim=1)
+        logp = F.log_softmax(x)
         target = target.view(-1,1)
         output = - logp.gather(1, target)
         return output
@@ -224,6 +224,7 @@ def run_training(args, tune_config={}, reporter=None):
 
         # re-weight gate rewards
         normalized_alpha = args.alpha / len(gate_saved_actions)
+        print(f"normalized alpha: {normalized_alpha}")
         # intermediate rewards for each gate
         for act in gate_saved_actions:
             gate_rewards.append((1 - act.float()).data * normalized_alpha)
