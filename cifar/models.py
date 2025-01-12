@@ -1036,7 +1036,7 @@ class ResNetFeedForwardRL(nn.Module):
             self.saved_actions.append(saved_action)
 
         if reinforce:  # for pure RL
-            softmax = self.softmax(x, dim=1)
+            softmax = self.softmax(x)
             action = softmax.multinomial(num_samples=1)
             self.saved_actions.append(action)
 
@@ -1269,7 +1269,7 @@ class ResNetRecurrentGateRL(nn.Module):
 
         if self.training:
             x = self.fc(x)
-            softmax = self.softmax(x, dim=1)
+            softmax = self.softmax(x)
             pred = softmax.multinomial(num_samples=1)
         else:
             x = self.fc(x)
