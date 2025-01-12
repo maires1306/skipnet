@@ -29,7 +29,7 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x)
+        logp = F.log_softmax(x, dim=1)
         target = target.view(-1,1)
         output = - logp.gather(1, target)
         return output
