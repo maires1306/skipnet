@@ -1165,7 +1165,7 @@ class ResNetFeedForwardRL(nn.Module):
 
 # FFGate-I
 # For CIFAR-10
-def cifar10_feedfoward_rl_38(pretrained=False, **kwargs):
+def cifar10_feedforward_rl_38(pretrained=False, **kwargs):
     """SkipNet-38 + RL with FFGate-I"""
     model = ResNetFeedForwardRL(
         BasicBlock, [6, 6, 6], num_classes=10, gate_type="ffgate1"
@@ -1190,7 +1190,7 @@ def cifar10_feedforward_rl_110(pretrained=False, **kwargs):
 
 
 # For CIFAR-100
-def cifar100_feedford_rl_38(pretrained=False, **kwargs):
+def cifar100_feedfoward_rl_38(pretrained=False, **kwargs):
     """SkipNet-38 + RL with FFGate-I"""
     model = ResNetFeedForwardRL(
         BasicBlock, [6, 6, 6], num_classes=100, gate_type="ffgate1"
