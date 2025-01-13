@@ -9,8 +9,6 @@ import os
 import shutil
 import time
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "4,5"
-
 import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
