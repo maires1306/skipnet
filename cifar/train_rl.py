@@ -240,10 +240,34 @@ def run_training(args, tune_config={}, reporter=None):
             cum_rewards.insert(0, R)
 
         # Apply REINFORCE to each gate
-        total_reinforce_loss = 0
+        total_reinforce_loss = 0  # Initialize total reinforcement loss
         for action, R in zip(gate_saved_actions, cum_rewards):
-            print(f"action: {action}")
-            print(f"R: {R}")
+            # Ensure the action is in a format compatible with Categorical
+            if action.dim() > 1:  # If action has more than one dimension
+                action_probs = torch.softmax(action.float(), dim=-1)  # Compute softmax for probabilities
+            else:
+                action_probs = action.float()  # Use raw probabilities for one-dimensional tensors
+
+            # Define a Categorical distribution using the computed probabilities
+            m = torch.distributions.Categorical(probs=action_probs)
+
+            # Compute the log probability of the taken action
+            if action.dim() > 1:
+                taken_action = action.argmax(dim=-1)  # Use argmax for multi-class actions
+            else:
+                taken_action = action.squeeze().long()  # Ensure the action is a long tensor
+
+            # Validate the action against the probability distribution
+            try:
+                log_prob = m.log_prob(taken_action)  # Log probability of the taken action
+            except ValueError as e:
+                print(f"[ERROR] Action validation failed with: {e}")
+                print(f"Action: {taken_action}, Probabilities: {action_probs}")
+                raise
+
+            # Compute the REINFORCE loss for this action and reward
+            reinforce_loss = -log_prob * args.rl_weight * R.detach()  # Detach the reward to avoid backprop through it
+            total_reinforce_loss += reinforce_loss.mean()  # Accumulate the loss
 
         # Compute total loss
         total_loss = total_criterion(output, target_var) + total_reinforce_loss
