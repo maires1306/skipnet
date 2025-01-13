@@ -357,8 +357,9 @@ def validate(args, test_loader, model):
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
         target = target.cuda(non_blocking=True)
-        input_var = Variable(input, volatile=True).cuda()
-        target_var = Variable(target, volatile=True).cuda()
+        with torch.no_grad():
+            input_var = Variable(input).cuda()
+            target_var = Variable(target).cuda()
 
         output, masks, probs = model(input_var)
         skips = [mask.data.le(0.5).float().mean() for mask in masks]
