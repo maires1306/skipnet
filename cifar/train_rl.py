@@ -226,7 +226,6 @@ def run_training(args, tune_config={}, reporter=None):
 
         # re-weight gate rewards
         normalized_alpha = args.alpha / len(gate_saved_actions)
-        print(f"normalized alpha: {normalized_alpha}")
         
         # intermediate rewards for each gate
         for act in gate_saved_actions:
