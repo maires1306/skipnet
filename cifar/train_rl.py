@@ -159,7 +159,7 @@ def run_training(args, tune_config={}, reporter=None):
     if args.resume:
         if os.path.isfile(args.resume):
             logging.info('=> loading checkpoint `{}`'.format(args.resume))
-            checkpoint = torch.load(args.resume)
+            checkpoint = torch.load(args.resume, weights_only=True)
             if args.restart:
                 best_prec1 = checkpoint['best_prec1']
                 args.start_iter = checkpoint['iter']
@@ -212,8 +212,9 @@ def run_training(args, tune_config={}, reporter=None):
         data_time.update(time.time() - end)
 
         target = target.cuda(non_blocking=True)
-        input_var = Variable(input).cuda()
-        target_var = Variable(target).cuda()
+        with torch.no_grad():
+            input_var = Variable(input).cuda()
+            target_var = Variable(target).cuda()
 
         # compute output
         output, masks, probs = model(input_var)
@@ -409,7 +410,7 @@ def test_model(args):
     if args.resume:
         if os.path.isfile(args.resume):
             logging.info('=> loading checkpoint `{}`'.format(args.resume))
-            checkpoint = torch.load(args.resume)
+            checkpoint = torch.load(args.resume, weights_only=True)
             args.start_iter = checkpoint['iter']
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
