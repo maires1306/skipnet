@@ -55,7 +55,7 @@ def parse_args():
                         help='momentum')
     parser.add_argument('--weight-decay', default=1e-4, type=float,
                         help='weight decay (default: 1e-4)')
-    parser.add_argument('--print-freq', default=10, type=int,
+    parser.add_argument('--print-freq', default=100, type=int,
                         help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str,
                         help='path to  latest checkpoint (default: None)')
@@ -79,6 +79,7 @@ def parse_args():
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     args = parse_args()
 
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
@@ -159,7 +160,7 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(non_blocking=True)
+        target = target.cuda()
         input_var = Variable(input).cuda()
         target_var = Variable(target).cuda()
 
@@ -175,7 +176,7 @@ def run_training(args):
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
-        losses.update(loss.item(), input.size(0))
+        losses.update(loss.data.item(), input.size(0))
         top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
 
@@ -205,14 +206,14 @@ def run_training(args):
                             loss=losses,
                             top1=top1)
             )
-            for idx in range(skip_ratios.len):
-                logging.info(
-                    "{} layer skipping = {:.3f}({:.3f})".format(
-                        idx,
-                        skip_ratios.val[idx],
-                        skip_ratios.avg[idx],
-                    )
-                )
+            # for idx in range(skip_ratios.len):
+            #     logging.info(
+            #         "{} layer skipping = {:.3f}({:.3f})".format(
+            #             idx,
+            #             skip_ratios.val[idx],
+            #             skip_ratios.avg[idx],
+            #         )
+            #     )
 
         # evaluate every 1000 steps
         if (i % args.eval_every == 0 and i > 0) or (i == (args.iters-1)):
@@ -244,7 +245,7 @@ def validate(args, test_loader, model, criterion):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(non_blocking=True)
+        target = target.cuda()
         input_var = Variable(input, volatile=True).cuda()
         target_var = Variable(target, volatile=True).cuda()
         # compute output
@@ -258,7 +259,7 @@ def validate(args, test_loader, model, criterion):
         prec1, = accuracy(output.data, target, topk=(1,))
         top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
-        losses.update(loss.item(), input.size(0))
+        losses.update(loss.data.item(), input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
 

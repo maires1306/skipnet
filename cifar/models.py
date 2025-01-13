@@ -209,12 +209,10 @@ class FeedforwardGateI(nn.Module):
         x = self.linear_layer(x).squeeze()
         softmax = self.prob_layer(x)
         logprob = self.logprob(x)
-
         # discretize output in forward pass.
         # use softmax gradients in backward pass
         x = (softmax[:, 1] > 0.5).float().detach() - \
-            softmax[:, 1].detach() + softmax[:, 1]
-
+            softmax[:, 1].detach() + softmax[:, 1]      # 离散化 但仍保留梯度
         x = x.view(x.size(0), 1, 1, 1)
         return x, logprob
 
@@ -288,8 +286,8 @@ class FeedforwardGateII(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
-        self.logprob = nn.LogSoftmax(dim=1)
+        self.prob_layer = nn.Softmax()
+        self.logprob = nn.LogSoftmax()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -301,7 +299,7 @@ class FeedforwardGateII(nn.Module):
         softmax = self.prob_layer(x)
         logprob = self.logprob(x)
 
-        # discretize
+        # discretize 离散化
         x = (softmax[:, 1] > 0.5).float().detach() - \
             softmax[:, 1].detach() + softmax[:, 1]
 
@@ -325,8 +323,8 @@ class SoftGateII(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
-        self.logprob = nn.LogSoftmax(dim=1)
+        self.prob_layer = nn.Softmax()
+        self.logprob = nn.LogSoftmax()
 
     def forward(self, x):
         x = self.conv1(x)
@@ -453,7 +451,10 @@ class ResNetFeedForwardSP(nn.Module):
         gprobs.append(gprob)
         masks.append(mask.squeeze())
         prev = x  # input of next layer
-
+        num=0
+        for i in mask.squeeze():
+            num+=i
+        print('-------',num)
         for g in range(3):
             for i in range(0 + int(g == 0), self.num_layers[g]):
                 if getattr(self, 'group{}_ds{}'.format(g+1, i)) is not None:
@@ -523,15 +524,11 @@ def cifar100_feedforward_110(pretrained=False, **kwargs):
 
 # For Recurrent Gate
 def repackage_hidden(h):
-    """Wraps hidden states in new Variables to detach them from their history."""
-    if isinstance(h, Variable):  # For backward compatibility with Variable
+    """ to reduce memory usage"""
+    if type(h) == Variable:
         return Variable(h.data)
-    elif isinstance(h, torch.Tensor):  # If it's a single tensor, detach it
-        return h.detach()
-    elif isinstance(h, (tuple, list)):  # If it's iterable, process recursively
-        return tuple(repackage_hidden(v) for v in h)
     else:
-        raise TypeError(f"Unsupported type for hidden state: {type(h)}")
+        return tuple(repackage_hidden(v) for v in h)
 
 
 class RNNGate(nn.Module):
@@ -566,6 +563,7 @@ class RNNGate(nn.Module):
     def forward(self, x):
         # Take the convolution output of each step
         batch_size = x.size(0)
+        # 提高内存利用率和效率 将参数放在一个块中
         self.rnn.flatten_parameters()
         out, self.hidden = self.rnn(x.view(1, batch_size, -1), self.hidden)
 
@@ -831,7 +829,7 @@ class RLFeedforwardGateI(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
+        self.prob_layer = nn.Softmax()
 
         # saved actions and rewards
         self.saved_action = []
@@ -852,7 +850,7 @@ class RLFeedforwardGateI(nn.Module):
         softmax = self.prob_layer(x)
 
         if self.training:
-            action = softmax.multinomial(num_samples=1)
+            action = softmax.multinomial()
             self.saved_action = action
         else:
             action = (softmax[:, 1] > 0.5).float()
@@ -877,7 +875,7 @@ class RLFeedforwardGateII(nn.Module):
         self.avg_layer = nn.AvgPool2d(pool_size)
         self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
                                       kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
+        self.prob_layer = nn.Softmax()
 
         # saved actions and rewards
         self.saved_action = None
@@ -893,7 +891,7 @@ class RLFeedforwardGateII(nn.Module):
         softmax = self.prob_layer(x)
 
         if self.training:
-            action = softmax.multinomial(num_samples=1)
+            action = softmax.multinomial()
             self.saved_action = action
         else:
             action = (softmax[:, 1] > 0.5).float()
@@ -931,7 +929,7 @@ class ResNetFeedForwardRL(nn.Module):
         self.avgpool = nn.AvgPool2d(8)
         self.fc = nn.Linear(64 * block.expansion, num_classes)
 
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = nn.Softmax()
         self.saved_actions = []
         self.rewards = []
 
@@ -1030,14 +1028,13 @@ class ResNetFeedForwardRL(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        # Collect all actions
-        for idx, inst in enumerate(self.gate_instances):
-            saved_action = inst.saved_action
-            self.saved_actions.append(saved_action)
+        # collect all actions
+        for inst in self.gate_instances:
+            self.saved_actions.append(inst.saved_action)
 
         if reinforce:  # for pure RL
             softmax = self.softmax(x)
-            action = softmax.multinomial(num_samples=1)
+            action = softmax.multinomial()
             self.saved_actions.append(action)
 
         return x, masks, gprobs
@@ -1045,7 +1042,7 @@ class ResNetFeedForwardRL(nn.Module):
 
 # FFGate-I
 # For CIFAR-10
-def cifar10_feedforward_rl_38(pretrained=False, **kwargs):
+def cifar10_feedfoward_rl_38(pretrained=False, **kwargs):
     """SkipNet-38 + RL with FFGate-I"""
     model = ResNetFeedForwardRL(BasicBlock, [6, 6, 6],
                                 num_classes=10, gate_type='ffgate1')
@@ -1067,7 +1064,7 @@ def cifar10_feedforward_rl_110(pretrained=False, **kwargs):
 
 
 # For CIFAR-100
-def cifar100_feedforward_rl_38(pretrained=False, **kwargs):
+def cifar100_feedford_rl_38(pretrained=False, **kwargs):
     """SkipNet-38 + RL with FFGate-I"""
     model = ResNetFeedForwardRL(BasicBlock, [6, 6, 6],
                                 num_classes=100, gate_type='ffgate1')
@@ -1138,8 +1135,14 @@ class RNNGatePolicy(nn.Module):
             proj = self.proj(out.squeeze())
             prob = self.prob(proj)
             bi_prob = torch.cat([1 - prob, prob], dim=1)
-            action = bi_prob.multinomial(num_samples=1)
-            self.saved_actions.append(action)
+            m = torch.distributions.Categorical(bi_prob)
+            # action = m.sample()
+            self.saved_actions.append(m)
+            # proj = self.proj(out.squeeze())
+            # prob = self.prob(proj)
+            # bi_prob = torch.cat([1 - prob, prob], dim=1)
+            # action = bi_prob.multinomial()
+            # self.saved_actions.append(action)
         else:
             proj = self.proj(out.squeeze())
             prob = self.prob(proj)
@@ -1268,9 +1271,16 @@ class ResNetRecurrentGateRL(nn.Module):
         x = x.view(x.size(0), -1)
 
         if self.training:
+
+
             x = self.fc(x)
             softmax = self.softmax(x)
-            pred = softmax.multinomial(num_samples=1)
+            pred = torch.distributions.Categorical(softmax)
+            # pred = m.sample()
+
+            # x = self.fc(x)
+            # softmax = self.softmax(x)
+            # pred = softmax.multinomial()
         else:
             x = self.fc(x)
             pred = x.max(1)[1]
@@ -1321,5 +1331,3 @@ def cifar100_rnn_gate_rl_110(pretrained=False, **kwargs):
     model = ResNetRecurrentGateRL(BasicBlock, [18, 18, 18], num_classes=100,
                                   embed_dim=10, hidden_dim=10)
     return model
-
-
