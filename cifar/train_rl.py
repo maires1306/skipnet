@@ -242,13 +242,11 @@ def run_training(args, tune_config={}, reporter=None):
         # Apply REINFORCE to each gate
         total_reinforce_loss = 0
         for action, R in zip(gate_saved_actions, cum_rewards):
-            print(action)
-            print(R)
+            print(f"action: {action}")
+            print(f"R: {R}")
 
         # Compute total loss
         total_loss = total_criterion(output, target_var) + total_reinforce_loss
-
-        logging.info(f"Total Loss: {total_loss.item()} | REINFORCE Loss: {total_reinforce_loss.item()}")
 
         optimizer.zero_grad()
         total_loss.backward(retain_graph=True)
