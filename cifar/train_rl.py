@@ -66,7 +66,7 @@ def parse_args():
                         help='momentum')
     parser.add_argument('--weight-decay', default=1e-4, type=float,
                         help='weight decay (default: 1e-4)')
-    parser.add_argument('--print-freq', default=10, type=int,
+    parser.add_argument('--print-freq', default=100, type=int,
                         help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str,
                         help='path to  latest checkpoint (default: None)')
@@ -80,7 +80,7 @@ def parse_args():
     parser.add_argument('--save-folder', default='save_checkpoints',
                         type=str,
                         help='folder to save the checkpoints')
-    parser.add_argument('--eval-every', default=200, type=int,
+    parser.add_argument('--eval-every', default=500, type=int,
                         help='evaluate model every (default: 200) iterations')
     parser.add_argument('--fine_tune', action='store_true',
                         help='fine tune model')
@@ -102,6 +102,7 @@ def parse_args():
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     args = parse_args()
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
     os.makedirs(save_path, exist_ok=True)
@@ -159,7 +160,7 @@ def run_training(args, tune_config={}, reporter=None):
     if args.resume:
         if os.path.isfile(args.resume):
             logging.info('=> loading checkpoint `{}`'.format(args.resume))
-            checkpoint = torch.load(args.resume, weights_only=True)
+            checkpoint = torch.load(args.resume)
             if args.restart:
                 best_prec1 = checkpoint['best_prec1']
                 args.start_iter = checkpoint['iter']
@@ -200,8 +201,6 @@ def run_training(args, tune_config={}, reporter=None):
 
     end = time.time()
 
-    print(f"alpha: {args.alpha}")
-
     # each batch is an episode
     print('start: ', args.start_iter)
     for i in range(args.start_iter, args.iters):
@@ -211,10 +210,9 @@ def run_training(args, tune_config={}, reporter=None):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(non_blocking=True)
-        with torch.no_grad():
-            input_var = Variable(input).cuda()
-            target_var = Variable(target).cuda()
+        target = target.cuda()
+        input_var = Variable(input).cuda()
+        target_var = Variable(target).cuda()
 
         # compute output
         output, masks, probs = model(input_var)
@@ -227,61 +225,38 @@ def run_training(args, tune_config={}, reporter=None):
 
         # re-weight gate rewards
         normalized_alpha = args.alpha / len(gate_saved_actions)
-        
         # intermediate rewards for each gate
         for act in gate_saved_actions:
             gate_rewards.append((1 - act.float()).data * normalized_alpha)
-        
+        # pdb.set_trace()
         # collect cumulative future rewards
-        R = -pred_loss.data
+        R = - pred_loss.data
         cum_rewards = []
         for r in gate_rewards[::-1]:
             R = r + args.gamma * R
             cum_rewards.insert(0, R)
 
-        # Apply REINFORCE to each gate
-        total_reinforce_loss = 0  # Initialize total reinforcement loss
-        for action, R in zip(gate_saved_actions, cum_rewards):
-            # Ensure the action is in a format compatible with Categorical
-            if action.dim() > 1:  # If action has more than one dimension
-                action_probs = torch.softmax(action.float(), dim=-1)  # Compute softmax for probabilities
-            else:
-                action_probs = action.float()  # Use raw probabilities for one-dimensional tensors
+        # apply REINFORCE to each gate
+        # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
+        for m, R in zip(gate_saved_actions, cum_rewards):
+            #  action.reinforce(args.rl_weight * R)
+            loss = -m.log_prob(m.sample())*args.rl_weight*R
+            loss.backward()
 
-            # Define a Categorical distribution using the computed probabilities
-            m = torch.distributions.Categorical(probs=action_probs)
 
-            # Compute the log probability of the taken action
-            if action.dim() > 1:
-                taken_action = action.argmax(dim=-1)  # Use argmax for multi-class actions
-            else:
-                taken_action = action.squeeze().long()  # Ensure the action is a long tensor
-
-            # Validate the action against the probability distribution
-            try:
-                log_prob = m.log_prob(taken_action)  # Log probability of the taken action
-            except ValueError as e:
-                print(f"[ERROR] Action validation failed with: {e}")
-                print(f"Action: {taken_action}, Probabilities: {action_probs}")
-                raise
-
-            # Compute the REINFORCE loss for this action and reward
-            reinforce_loss = -log_prob * args.rl_weight * R.detach()  # Detach the reward to avoid backprop through it
-            total_reinforce_loss += reinforce_loss.mean()  # Accumulate the loss
-
-        # Compute total loss
-        total_loss = total_criterion(output, target_var) + total_reinforce_loss
+        total_loss = total_criterion(output, target_var)
 
         optimizer.zero_grad()
-        total_loss.backward(retain_graph=True)
+        # optimize hybrid loss
+        torch.autograd.backward(gate_saved_actions + [total_loss])
         optimizer.step()
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
         total_rewards.update(cum_rewards[0].mean(), input.size(0))
-        total_losses.update(total_loss.mean().item(), input.size(0))
-        losses.update(pred_loss.mean().item(), input.size(0))
-        top1.update(prec1.item(), input.size(0))
+        total_losses.update(total_loss.mean().data[0], input.size(0))
+        losses.update(pred_loss.mean().data[0], input.size(0))
+        top1.update(prec1[0], input.size(0))
         skip_ratios.update(skips, input.size(0))
         total_gate_reward = sum([r.mean() for r in gate_rewards])
 
@@ -293,8 +268,7 @@ def run_training(args, tune_config={}, reporter=None):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if reporter:
-            reporter(timesteps_total=i, neg_mean_loss=losses.val)
+        if reporter: reporter(timesteps_total=i, neg_mean_loss=losses.val)
         # print log
         if i % args.print_freq == 0 or i == (args.iters - 1):
             logging.info("Iter: [{0}/{1}]\t"
@@ -343,7 +317,6 @@ def run_training(args, tune_config={}, reporter=None):
                                                           '.pth.tar'))
 
 
-
 def validate(args, test_loader, model):
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -356,10 +329,9 @@ def validate(args, test_loader, model):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(non_blocking=True)
-        with torch.no_grad():
-            input_var = Variable(input).cuda()
-            target_var = Variable(target).cuda()
+        target = target.cuda()
+        input_var = Variable(input, volatile=True).cuda()
+        target_var = Variable(target, volatile=True).cuda()
 
         output, masks, probs = model(input_var)
         skips = [mask.data.le(0.5).float().mean() for mask in masks]
@@ -368,7 +340,7 @@ def validate(args, test_loader, model):
 
         # measure accuracy and record loss
         prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1.item(), input.size(0))
+        top1.update(prec1[0], input.size(0))
         skip_ratios.update(skips, input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
@@ -411,7 +383,7 @@ def test_model(args):
     if args.resume:
         if os.path.isfile(args.resume):
             logging.info('=> loading checkpoint `{}`'.format(args.resume))
-            checkpoint = torch.load(args.resume, weights_only=True)
+            checkpoint = torch.load(args.resume)
             args.start_iter = checkpoint['iter']
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
@@ -521,5 +493,4 @@ def accuracy(output, target, topk=(1,)):
 
 if __name__ == '__main__':
     main()
-
 
