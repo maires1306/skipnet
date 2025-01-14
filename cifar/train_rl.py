@@ -32,7 +32,7 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x)
+        logp = F.log_softmax(x, dim=1)
         target = target.view(-1, 1)
         output = -logp.gather(1, target)
         return output
@@ -399,7 +399,7 @@ def run_training(args, tune_config={}, reporter=None):
 
         # evaluation
         if (i % args.eval_every == 0) or (i == (args.iters - 1)):
-            prec1, cp = validate(args, test_loader, model)
+            prec1, cp, skip_labels = validate(args, test_loader, model)
 
             is_best = prec1 > best_prec1
             best_prec1 = max(prec1, best_prec1)
