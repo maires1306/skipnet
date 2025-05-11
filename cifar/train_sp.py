@@ -7,7 +7,6 @@ from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
 
 import os
 import shutil
@@ -159,12 +158,10 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(async=False)
-        input_var = Variable(input).cuda()
-        target_var = Variable(target).cuda()
+        input_var  = input.cuda(non_blocking=True)
+        target_var = target.cuda(non_blocking=True)
 
-        # compute output
-        output, masks, logprobs = model(input_var)
+        output, masks, probs = model(input_var)
 
         # collect skip ratio of each layer
         skips = [mask.data.le(0.5).float().mean() for mask in masks]
@@ -174,9 +171,9 @@ def run_training(args):
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        losses.update(loss.data[0], input.size(0))
-        top1.update(prec1[0], input.size(0))
+        prec1, = accuracy(output.data, target_var, topk=(1,))
+        losses.update(loss.data.item(), input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
 
         # compute gradient and do SGD step
@@ -244,21 +241,22 @@ def validate(args, test_loader, model, criterion):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(async=True)
-        input_var = Variable(input, volatile=True).cuda()
-        target_var = Variable(target, volatile=True).cuda()
-        # compute output
-        output, masks, _ = model(input_var)
+        input_var  = input.cuda(non_blocking=True)
+        target_var = target.cuda(non_blocking=True)
+
+        with torch.no_grad():
+            output, masks, probs = model(input_var)
+
         skips = [mask.data.le(0.5).float().mean() for mask in masks]
         if skip_ratios.len != len(skips):
             skip_ratios.set_len(len(skips))
         loss = criterion(output, target_var)
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1[0], input.size(0))
+        prec1, = accuracy(output.data, target_var, topk=(1,))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
-        losses.update(loss.data[0], input.size(0))
+        losses.update(loss.data.item(), input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
 
