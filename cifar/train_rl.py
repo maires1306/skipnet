@@ -227,8 +227,13 @@ def run_training(args, tune_config={}, reporter=None):
         # update metrics
         prec1, = accuracy(outputs.data, targets, topk=(1,))
         top1.update(prec1.item(), inputs.size(0))
+        # make sure the meter knows how many gates we have
+        if skip_ratios.len != len(masks):
+            skip_ratios.set_len(len(masks))
+
         skip_ratios.update([m.data.le(0.5).float().mean() for m in masks],
-                            inputs.size(0))
+                        inputs.size(0))
+
 
         # clear saved log-probs for next iteration
         for gate in model.module.gate_instances:
