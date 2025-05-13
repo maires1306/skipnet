@@ -28,7 +28,7 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x)
+        logp = F.log_softmax(x, dim=1)
         target = target.view(-1,1)
         output = - logp.gather(1, target)
         return output
@@ -211,8 +211,7 @@ def run_training(args, tune_config={}, reporter=None):
         input_var  = input.cuda(non_blocking=True)
         target_var = target.cuda(non_blocking=True)
 
-        with torch.no_grad():
-            output, masks, probs = model(input_var)
+        output, masks, probs = model(input_var)
 
         skips = [mask.data.le(0.5).float().mean() for mask in masks]
         if skip_ratios.len != len(skips):
