@@ -7,6 +7,7 @@ import torch.nn as nn
 import math
 from torch.autograd import Variable
 import torch.autograd as autograd
+from torch.distributions import Categorical
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -805,98 +806,58 @@ def cifar100_rnn_gate_152(pretrained=False, **kwargs):
 ########################################
 
 class RLFeedforwardGateI(nn.Module):
-    """ FFGate-I with sampling. Use Pytorch 2.0"""
+    """FFGate-I with sampling via Categorical (PyTorch ≥2.0)"""
     def __init__(self, pool_size=5, channel=10):
-        super(RLFeedforwardGateI, self).__init__()
-        self.pool_size = pool_size
-        self.channel = channel
-
-        self.maxpool = nn.MaxPool2d(2)
-        self.conv1 = conv3x3(channel, channel)
-        self.bn1 = nn.BatchNorm2d(channel)
-        self.relu1 = nn.ReLU(inplace=True)
-
-        # adding another conv layer
-        self.conv2 = conv3x3(channel, channel, stride=2)
-        self.bn2 = nn.BatchNorm2d(channel)
-        self.relu2 = nn.ReLU(inplace=True)
-
-        pool_size = math.floor(pool_size/2)  # for max pooling
-        pool_size = math.floor(pool_size/2 + 0.5)  # for conv stride = 2
-
-        self.avg_layer = nn.AvgPool2d(pool_size)
-        self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
-                                      kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
-
-        # saved actions and rewards
-        self.saved_action = []
-        self.rewards = []
+        super().__init__()
+        self.maxpool          = nn.MaxPool2d(2)
+        self.conv1            = conv3x3(channel, channel)
+        self.bn1              = nn.BatchNorm2d(channel)
+        self.relu1            = nn.ReLU(inplace=True)
+        self.conv2            = conv3x3(channel, channel, stride=2)
+        self.bn2              = nn.BatchNorm2d(channel)
+        self.relu2            = nn.ReLU(inplace=True)
+        size                   = math.floor(math.floor(pool_size/2)/2 + 0.5)
+        self.avg_layer        = nn.AvgPool2d(size)
+        self.linear_layer     = nn.Conv2d(channel, 2, 1)
+        self.prob_layer       = nn.Softmax(dim=1)
+        self.saved_log_probs  = []
 
     def forward(self, x):
-        x = self.maxpool(x)
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu1(x)
-
-        x = self.conv2(x)
-        x = self.bn2(x)
-        x = self.relu2(x)
-
-        x = self.avg_layer(x)
-        x = self.linear_layer(x).squeeze()
-        softmax = self.prob_layer(x)
-
+        b = x.size(0)
+        x = self.relu1(self.bn1(self.conv1(self.maxpool(x))))
+        x = self.relu2(self.bn2(self.conv2(x)))
+        feats   = self.avg_layer(x)
+        logits  = self.linear_layer(feats).squeeze()        # [b,2]
+        dist    = Categorical(logits=logits)
+        action  = dist.sample().view(b,1,1,1).float()
         if self.training:
-            action = softmax.multinomial(num_samples=1)
-            self.saved_action = action
-        else:
-            action = (softmax[:, 1] > 0.5).float()
-            self.saved_action = action
-
-        action = action.view(action.size(0), 1, 1, 1).float()
-        return action, softmax
+            self.saved_log_probs.append(dist.log_prob(action.view(b)))
+        return action, logits
 
 
 class RLFeedforwardGateII(nn.Module):
+    """FFGate-II with sampling via Categorical"""
     def __init__(self, pool_size=5, channel=10):
-        super(RLFeedforwardGateII, self).__init__()
-        self.pool_size = pool_size
-        self.channel = channel
-
-        self.conv1 = conv3x3(channel, channel, stride=2)
-        self.bn1 = nn.BatchNorm2d(channel)
-        self.relu1 = nn.ReLU(inplace=True)
-
-        pool_size = math.floor(pool_size/2 + 0.5)  # for conv stride = 2
-
-        self.avg_layer = nn.AvgPool2d(pool_size)
-        self.linear_layer = nn.Conv2d(in_channels=channel, out_channels=2,
-                                      kernel_size=1, stride=1)
-        self.prob_layer = nn.Softmax(dim=1)
-
-        # saved actions and rewards
-        self.saved_action = None
-        self.rewards = []
+        super().__init__()
+        self.conv1            = conv3x3(channel, channel, stride=2)
+        self.bn1              = nn.BatchNorm2d(channel)
+        self.relu1            = nn.ReLU(inplace=True)
+        size                   = math.floor(pool_size/2 + 0.5)
+        self.avg_layer        = nn.AvgPool2d(size)
+        self.linear_layer     = nn.Conv2d(channel, 2, 1)
+        self.prob_layer       = nn.Softmax(dim=1)
+        self.saved_log_probs  = []
 
     def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu1(x)
-
-        x = self.avg_layer(x)
-        x = self.linear_layer(x).squeeze()
-        softmax = self.prob_layer(x)
-
+        b = x.size(0)
+        x = self.relu1(self.bn1(self.conv1(x)))
+        feats   = self.avg_layer(x)
+        logits  = self.linear_layer(feats).squeeze()        # [b,2]
+        dist    = Categorical(logits=logits)
+        action  = dist.sample().view(b,1,1,1).float()
         if self.training:
-            action = softmax.multinomial(num_samples=1)
-            self.saved_action = action
-        else:
-            action = (softmax[:, 1] > 0.5).float()
-            self.saved_action = action
-
-        action = action.view(action.size(0), 1, 1, 1).float()
-        return action, softmax
+            self.saved_log_probs.append(dist.log_prob(action.view(b)))
+        return action, logits
 
 
 class ResNetFeedForwardRL(nn.Module):
@@ -1088,61 +1049,32 @@ def cifar100_feedforward_rl_110(pretrained=False, **kwargs):
 ########################################
 
 class RNNGatePolicy(nn.Module):
+    """Recurrent gate policy with Categorical sampling"""
     def __init__(self, input_dim, hidden_dim, rnn_type='lstm'):
-        super(RNNGatePolicy, self).__init__()
-
-        self.rnn_type = rnn_type
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-
-        if self.rnn_type == 'lstm':
-            self.rnn = nn.LSTM(input_dim, hidden_dim)
-        else:
-            self.rnn = None
-        self.hidden = None
-
-        # reduce dim. use softmax here for two actions.
-        self.proj = nn.Linear(hidden_dim, 1)
-        self.prob = nn.Sigmoid()
-
-        # saved actions and rewards
-        self.saved_actions = []
-        self.rewards = []
-
-    def hotter(self, t):
-        self.proj.weight.data /= t
-        self.proj.bias.data /= t
+        super().__init__()
+        self.rnn              = nn.LSTM(input_dim, hidden_dim) if rnn_type=='lstm' else None
+        self.proj             = nn.Linear(hidden_dim, 2)      # output 2 logits
+        self.saved_log_probs  = []
+        self.hidden           = None
 
     def init_hidden(self, batch_size):
-        # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (autograd.Variable(torch.zeros(1, batch_size,
-                                              self.hidden_dim).cuda()),
-                autograd.Variable(torch.zeros(1, batch_size,
-                                              self.hidden_dim).cuda()))
+        h = torch.zeros(1, batch_size, self.rnn.hidden_size, device=next(self.parameters()).device)
+        return (h, h)
 
     def repackage_hidden(self):
-        self.hidden = repackage_hidden(self.hidden)
+        self.hidden = (self.hidden[0].detach(), self.hidden[1].detach())
 
     def forward(self, x):
-        batch_size = x.size(0)
+        b = x.size(0)
         self.rnn.flatten_parameters()
-        out, self.hidden = self.rnn(x.view(1, batch_size, -1), self.hidden)
-
-        # do action selection in the forward pass
+        out, self.hidden = self.rnn(x.view(1,b,-1), self.hidden)
+        logits = self.proj(out.squeeze())                  # [b,2]
+        dist   = Categorical(logits=logits)
+        action = dist.sample().view(b,1,1,1).float()
         if self.training:
-            proj = self.proj(out.squeeze())
-            prob = self.prob(proj)
-            bi_prob = torch.cat([1 - prob, prob], dim=1)
-            action = bi_prob.multinomial(num_samples=1)
-            self.saved_actions.append(action)
-        else:
-            proj = self.proj(out.squeeze())
-            prob = self.prob(proj)
-            bi_prob = torch.cat([1 - prob, prob], dim=1)
-            action = (prob > 0.5).float()
-            self.saved_actions.append(action)
-        action = action.view(action.size(0), 1, 1, 1).float()
-        return action, bi_prob
+            self.saved_log_probs.append(dist.log_prob(action.view(b)))
+        return action, logits
+
 
 
 class ResNetRecurrentGateRL(nn.Module):

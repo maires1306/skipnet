@@ -17,6 +17,7 @@ import logging
 import models
 from data import *
 import pdb
+from torch.distributions import Categorical
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith('__')
@@ -139,176 +140,134 @@ def main():
 
 
 def run_training(args, tune_config={}, reporter=None):
-    vars(args).update(tune_config)
-    # create model
-    model = models.__dict__[args.arch](args.pretrained).cuda()
-    model = torch.nn.DataParallel(model).cuda()
+    from torch.distributions import Categorical
 
-    # extract gate actions and rewards
+    # merge any tuning overrides
+    vars(args).update(tune_config)
+
+    # build and wrap model
+    model = models.__dict__[args.arch](args.pretrained).cuda()
+    model = torch.nn.DataParallel(model)
+
+    # pull out gate histories
     if args.gate_type == 'ff':
-        gate_saved_actions = model.module.saved_actions
-        gate_rewards = model.module.rewards
-    elif args.gate_type == 'rnn':
-        gate_saved_actions = model.module.control.saved_actions
-        gate_rewards = model.module.control.rewards
+        gate_saved_actions    = model.module.saved_actions
+        gate_saved_log_probs  = model.module.saved_log_probs
+        gate_rewards          = model.module.rewards
+    else:  # 'rnn'
+        gate_saved_actions    = model.module.control.saved_actions
+        gate_saved_log_probs  = model.module.control.saved_log_probs
+        gate_rewards          = model.module.control.rewards
 
     best_prec1 = 0
 
-    # load checkpoint from supervised pre-training stage
-    if args.resume:
-        if os.path.isfile(args.resume):
-            logging.info('=> loading checkpoint `{}`'.format(args.resume))
-            checkpoint = torch.load(args.resume)
-            if args.restart:
-                best_prec1 = checkpoint['best_prec1']
-                args.start_iter = checkpoint['iter']
-            model.load_state_dict(checkpoint['state_dict'])
-            logging.info('=> loaded checkpoint `{}` (iter: {})'.format(
-                args.resume, checkpoint['iter']
-            ))
-        else:
-            logging.info('=> no checkpoint found at `{}`'.format(args.resume))
+    # optionally resume from checkpoint
+    if args.resume and os.path.isfile(args.resume):
+        logging.info(f"=> loading checkpoint `{args.resume}`")
+        checkpoint = torch.load(args.resume)
+        if args.restart:
+            best_prec1      = checkpoint['best_prec1']
+            args.start_iter = checkpoint['iter']
+        model.load_state_dict(checkpoint['state_dict'])
+        logging.info(f"=> loaded checkpoint `{args.resume}` (iter: {checkpoint['iter']})")
 
     cudnn.benchmark = True
 
-    train_loader = prepare_train_data(dataset=args.dataset,
-                                      batch_size=args.batch_size,
-                                      shuffle=True,
-                                      num_workers=args.workers)
-    test_loader = prepare_test_data(dataset=args.dataset,
-                                    batch_size=args.batch_size,
-                                    shuffle=False,
-                                    num_workers=args.workers)
+    train_loader = prepare_train_data(args.dataset, args.batch_size, True, args.workers)
+    test_loader  = prepare_test_data(args.dataset, args.batch_size, False, args.workers)
 
-    # define loss function (criterion) and optimizer
-    criterion = BatchCrossEntropy().cuda()
-    total_criterion = nn.CrossEntropyLoss().cuda()
+    # loss & optimizer
+    bias_criterion   = BatchCrossEntropy().cuda()         # for shaping rewards
+    ce_criterion     = nn.CrossEntropyLoss().cuda()       # supervised loss
+    optimizer        = torch.optim.SGD(
+                           filter(lambda p: p.requires_grad, model.parameters()),
+                           args.lr, momentum=args.momentum, weight_decay=args.weight_decay
+                       )
 
-    optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad,
-                                       model.parameters()), args.lr,
-                                momentum=args.momentum,
-                                weight_decay=args.weight_decay)
-
+    # meters
     batch_time = AverageMeter()
-    data_time = AverageMeter()
-    total_rewards = AverageMeter()
-    total_losses = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    skip_ratios = ListAverageMeter()
+    data_time  = AverageMeter()
+    top1       = AverageMeter()
+    skip_ratios= ListAverageMeter()
 
     end = time.time()
-
-    # each batch is an episode
-    print('start: ', args.start_iter)
+    print('start:', args.start_iter)
     for i in range(args.start_iter, args.iters):
         model.train()
         adjust_learning_rate(args, optimizer, i)
-        input, target = next(iter(train_loader))
-        # measuring data loading time
+
+        # load a batch
+        inputs, targets = next(iter(train_loader))
         data_time.update(time.time() - end)
+        inputs  = inputs.cuda(non_blocking=True)
+        targets = targets.cuda(non_blocking=True)
 
-        input_var  = input.cuda(non_blocking=True)
-        target_var = target.cuda(non_blocking=True)
+        # forward
+        outputs, masks, _ = model(inputs)
 
-        output, masks, probs = model(input_var)
-
-        skips = [mask.data.le(0.5).float().mean() for mask in masks]
-        if skip_ratios.len != len(skips):
-            skip_ratios.set_len(len(skips))
-
-        pred_loss = criterion(output, target_var)
-
-        # re-weight gate rewards
+        # compute shaping loss and rewards
+        pred_loss = bias_criterion(outputs, targets)  # [batch,1]
         normalized_alpha = args.alpha / len(gate_saved_actions)
-        # intermediate rewards for each gate
         for act in gate_saved_actions:
             gate_rewards.append((1 - act.float()).data * normalized_alpha)
-        # pdb.set_trace()
-        # collect cumulative future rewards
-        R = - pred_loss.data
-        cum_rewards = []
+
+        # discounted returns
+        R = -pred_loss.data
+        returns = []
         for r in gate_rewards[::-1]:
             R = r + args.gamma * R
-            cum_rewards.insert(0, R)
+            returns.insert(0, R)
 
-        # apply REINFORCE to each gate
-        # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
-        for action, R in zip(gate_saved_actions, cum_rewards):
-             action.reinforce(args.rl_weight * R)
+        # policy gradient loss
+        policy_losses = []
+        for logp, R in zip(gate_saved_log_probs, returns):
+            policy_losses.append(-logp * R * args.rl_weight)
+        policy_loss = torch.stack(policy_losses).sum()
 
+        # supervised classification loss
+        ce_loss = ce_criterion(outputs, targets)
 
-        total_loss = total_criterion(output, target_var)
-
+        # combined update
+        loss = ce_loss + policy_loss
         optimizer.zero_grad()
-        # optimize hybrid loss
-        torch.autograd.backward(gate_saved_actions + [total_loss])
+        loss.backward()
         optimizer.step()
 
-        # measure accuracy and record loss
-        prec1, = accuracy(output.data, target_var, topk=(1,))
-        total_rewards.update(cum_rewards[0].mean(), input.size(0))
-        total_losses.update(total_loss.mean().data.item(), input.size(0))
-        losses.update(pred_loss.mean().data.item(), input.size(0))
-        top1.update(prec1.item(), input.size(0))
-        skip_ratios.update(skips, input.size(0))
-        total_gate_reward = sum([r.mean() for r in gate_rewards])
+        # record metrics
+        prec1, = accuracy(outputs.data, targets, topk=(1,))
+        top1.update(prec1.item(), inputs.size(0))
+        skips = [m.data.le(0.5).float().mean() for m in masks]
+        skip_ratios.update(skips, inputs.size(0))
 
-        # clear saved actions and rewards
+        # clear histories
         del gate_saved_actions[:]
+        del gate_saved_log_probs[:]
         del gate_rewards[:]
 
-        # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if reporter: reporter(timesteps_total=i, neg_mean_loss=losses.val)
-        # print log
-        if i % args.print_freq == 0 or i == (args.iters - 1):
-            logging.info("Iter: [{0}/{1}]\t"
-                         "Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t"
-                         "Data {data_time.val:.3f} ({data_time.avg:.3f})\t"
-                         "Total reward {total_rewards.val: .3f}"
-                         "({total_rewards.avg: .3f})\t"
-                         "Total gate reward {total_gate_reward: .3f}\t"
-                         "Total Loss {total_losses.val:.3f} "
-                         "({total_losses.avg:.3f})\t"
-                         "Loss {loss.val:.3f} ({loss.avg:.3f})\t"
-                         "Prec@1 {top1.val:.3f} ({top1.avg:.3f})".format(
-                            i,
-                            args.iters,
-                            batch_time=batch_time,
-                            data_time=data_time,
-                            total_rewards=total_rewards,
-                            total_gate_reward=total_gate_reward,
-                            total_losses=total_losses,
-                            loss=losses,
-                            top1=top1)
-            )
+        if i % args.print_freq == 0 or i == (args.iters-1):
+            logging.info(f"Iter [{i}/{args.iters}] "
+                         f"Time {batch_time.val:.3f} ({batch_time.avg:.3f}) "
+                         f"Data {data_time.val:.3f} "
+                         f"CE {ce_loss.item():.3f} "
+                         f"PG {policy_loss.item():.3f} "
+                         f"Prec@1 {top1.val:.3f}")
 
-        # evaluation
-        if (i % args.eval_every == 0) or (i == (args.iters-1)):
+        if (i % args.eval_every == 0) or (i == args.iters-1):
             prec1, cp = validate(args, test_loader, model)
-
-            # clear saved actions and rewards
-            del gate_saved_actions[:]
-            del gate_rewards[:]
-
             is_best = prec1 > best_prec1
             best_prec1 = max(prec1, best_prec1)
-            checkpoint_path = os.path.join(args.save_path,
-                                           'checkpoint_{:05d}.pth.tar'.format(
-                                               i))
-            save_checkpoint({
+            ckpt = {
                 'iter': i,
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
-                'best_prec1': best_prec1,
-            },
-                is_best, filename=checkpoint_path)
-            shutil.copyfile(checkpoint_path, os.path.join(args.save_path,
-                                                          'checkpoint_latest'
-                                                          '.pth.tar'))
+                'best_prec1': best_prec1
+            }
+            fname = os.path.join(args.save_path, f'checkpoint_{i:05d}.pth.tar')
+            save_checkpoint(ckpt, is_best, filename=fname)
+            shutil.copyfile(fname, os.path.join(args.save_path, 'checkpoint_latest.pth.tar'))
 
 
 def validate(args, test_loader, model):
