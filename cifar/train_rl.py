@@ -142,53 +142,41 @@ def main():
 def run_training(args, tune_config={}, reporter=None):
     from torch.distributions import Categorical
 
-    # merge any tuning overrides
+    # merge any hyperparam overrides (for Ray Tune, etc)
     vars(args).update(tune_config)
 
-    # build and wrap model
+    # build model
     model = models.__dict__[args.arch](args.pretrained).cuda()
     model = torch.nn.DataParallel(model)
 
-    # pull out gate histories
-    if args.gate_type == 'ff':
-        gate_saved_actions    = model.module.saved_actions
-        gate_saved_log_probs  = model.module.saved_log_probs
-        gate_rewards          = model.module.rewards
-    else:  # 'rnn'
-        gate_saved_actions    = model.module.control.saved_actions
-        gate_saved_log_probs  = model.module.control.saved_log_probs
-        gate_rewards          = model.module.control.rewards
-
     best_prec1 = 0
-
-    # optionally resume from checkpoint
+    # optionally resume
     if args.resume and os.path.isfile(args.resume):
         logging.info(f"=> loading checkpoint `{args.resume}`")
-        checkpoint = torch.load(args.resume)
+        ckpt = torch.load(args.resume)
         if args.restart:
-            best_prec1      = checkpoint['best_prec1']
-            args.start_iter = checkpoint['iter']
-        model.load_state_dict(checkpoint['state_dict'])
-        logging.info(f"=> loaded checkpoint `{args.resume}` (iter: {checkpoint['iter']})")
+            best_prec1      = ckpt['best_prec1']
+            args.start_iter = ckpt['iter']
+        model.load_state_dict(ckpt['state_dict'])
+        logging.info(f"=> loaded checkpoint `{args.resume}` (iter: {ckpt['iter']})")
 
     cudnn.benchmark = True
-
-    train_loader = prepare_train_data(args.dataset, args.batch_size, True, args.workers)
+    train_loader = prepare_train_data(args.dataset, args.batch_size, True,  args.workers)
     test_loader  = prepare_test_data(args.dataset, args.batch_size, False, args.workers)
 
-    # loss & optimizer
-    bias_criterion   = BatchCrossEntropy().cuda()         # for shaping rewards
-    ce_criterion     = nn.CrossEntropyLoss().cuda()       # supervised loss
-    optimizer        = torch.optim.SGD(
-                           filter(lambda p: p.requires_grad, model.parameters()),
-                           args.lr, momentum=args.momentum, weight_decay=args.weight_decay
-                       )
+    # define losses & optimizer
+    bias_criterion = BatchCrossEntropy().cuda()     # for shaping intermediate rewards
+    ce_criterion   = nn.CrossEntropyLoss().cuda()   # supervised loss
+    optimizer      = torch.optim.SGD(
+                         filter(lambda p: p.requires_grad, model.parameters()),
+                         args.lr, args.momentum, args.weight_decay
+                     )
 
     # meters
-    batch_time = AverageMeter()
-    data_time  = AverageMeter()
-    top1       = AverageMeter()
-    skip_ratios= ListAverageMeter()
+    batch_time  = AverageMeter()
+    data_time   = AverageMeter()
+    top1        = AverageMeter()
+    skip_ratios = ListAverageMeter()
 
     end = time.time()
     print('start:', args.start_iter)
@@ -196,7 +184,7 @@ def run_training(args, tune_config={}, reporter=None):
         model.train()
         adjust_learning_rate(args, optimizer, i)
 
-        # load a batch
+        # fetch batch
         inputs, targets = next(iter(train_loader))
         data_time.update(time.time() - end)
         inputs  = inputs.cuda(non_blocking=True)
@@ -205,68 +193,74 @@ def run_training(args, tune_config={}, reporter=None):
         # forward
         outputs, masks, _ = model(inputs)
 
-        # compute shaping loss and rewards
-        pred_loss = bias_criterion(outputs, targets)  # [batch,1]
-        normalized_alpha = args.alpha / len(gate_saved_actions)
-        for act in gate_saved_actions:
-            gate_rewards.append((1 - act.float()).data * normalized_alpha)
+        # 1) gather all saved log-probs
+        gate_saved_log_probs = []
+        for gate in model.module.gate_instances:
+            gate_saved_log_probs.extend(gate.saved_log_probs)
 
-        # discounted returns
-        R = -pred_loss.data
+        # 2) compute per-gate shaping rewards from the discrete masks
+        alpha_norm = args.alpha / len(masks)
+        gate_rewards = [(1 - m).detach() * alpha_norm for m in masks]
+
+        # 3) compute discounted returns
+        R = -bias_criterion(outputs, targets).data
         returns = []
         for r in gate_rewards[::-1]:
             R = r + args.gamma * R
             returns.insert(0, R)
 
-        # policy gradient loss
+        # 4) build policy-gradient loss
         policy_losses = []
         for logp, R in zip(gate_saved_log_probs, returns):
             policy_losses.append(-logp * R * args.rl_weight)
         policy_loss = torch.stack(policy_losses).sum()
 
-        # supervised classification loss
+        # 5) supervised classification loss
         ce_loss = ce_criterion(outputs, targets)
 
-        # combined update
+        # 6) combined backward and step
         loss = ce_loss + policy_loss
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        # record metrics
+        # update metrics
         prec1, = accuracy(outputs.data, targets, topk=(1,))
         top1.update(prec1.item(), inputs.size(0))
-        skips = [m.data.le(0.5).float().mean() for m in masks]
-        skip_ratios.update(skips, inputs.size(0))
+        skip_ratios.update([m.data.le(0.5).float().mean() for m in masks],
+                            inputs.size(0))
 
-        # clear histories
-        del gate_saved_actions[:]
-        del gate_saved_log_probs[:]
-        del gate_rewards[:]
+        # clear saved log-probs for next iteration
+        for gate in model.module.gate_instances:
+            gate.saved_log_probs.clear()
 
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % args.print_freq == 0 or i == (args.iters-1):
-            logging.info(f"Iter [{i}/{args.iters}] "
-                         f"Time {batch_time.val:.3f} ({batch_time.avg:.3f}) "
-                         f"Data {data_time.val:.3f} "
-                         f"CE {ce_loss.item():.3f} "
-                         f"PG {policy_loss.item():.3f} "
-                         f"Prec@1 {top1.val:.3f}")
+        # logging
+        if i % args.print_freq == 0 or i == args.iters-1:
+            logging.info(
+                f"Iter [{i}/{args.iters}]  "
+                f"Time {batch_time.val:.3f} ({batch_time.avg:.3f})  "
+                f"Data {data_time.val:.3f}  "
+                f"CE {ce_loss.item():.3f}  "
+                f"PG {policy_loss.item():.3f}  "
+                f"Prec@1 {top1.val:.3f}"
+            )
 
+        # periodic evaluation + checkpoint
         if (i % args.eval_every == 0) or (i == args.iters-1):
             prec1, cp = validate(args, test_loader, model)
             is_best = prec1 > best_prec1
             best_prec1 = max(prec1, best_prec1)
-            ckpt = {
+            state = {
                 'iter': i,
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
                 'best_prec1': best_prec1
             }
             fname = os.path.join(args.save_path, f'checkpoint_{i:05d}.pth.tar')
-            save_checkpoint(ckpt, is_best, filename=fname)
+            save_checkpoint(state, is_best, filename=fname)
             shutil.copyfile(fname, os.path.join(args.save_path, 'checkpoint_latest.pth.tar'))
 
 
