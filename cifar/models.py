@@ -987,15 +987,6 @@ class ResNetFeedForwardRL(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
-        # collect all actions
-        for inst in self.gate_instances:
-            self.saved_actions.append(inst.saved_action)
-
-        if reinforce:  # for pure RL
-            softmax = self.softmax(x)
-            action = softmax.multinomial(num_samples=1)
-            self.saved_actions.append(action)
-
         return x, masks, gprobs
 
 
