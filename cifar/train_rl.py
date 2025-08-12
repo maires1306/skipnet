@@ -6,7 +6,6 @@ from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
 import torch.nn.functional as F
 
 import os
@@ -29,9 +28,10 @@ class BatchCrossEntropy(nn.Module):
         super(BatchCrossEntropy, self).__init__()
 
     def forward(self, x, target):
-        logp = F.log_softmax(x)
-        target = target.view(-1,1)
-        output = - logp.gather(1, target)
+        # target deve ser long
+        target = target.long().view(-1, 1)
+        logp = F.log_softmax(x, dim=1)
+        output = -logp.gather(1, target)  # (B,1)
         return output
 
 
@@ -209,53 +209,56 @@ def run_training(args, tune_config={}, reporter=None):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda(async=False)
-        input_var = Variable(input).cuda()
-        target_var = Variable(target).cuda()
+        target = target.cuda(non_blocking=True)
+        input_var = input.cuda(non_blocking=True)
+        target_var = target  # já no device
 
         # compute output
         output, masks, probs = model(input_var)
 
-        skips = [mask.data.le(0.5).float().mean() for mask in masks]
+        # skips como floats
+        skips = [mask.detach().le(0.5).float().mean().item() for mask in masks]
         if skip_ratios.len != len(skips):
             skip_ratios.set_len(len(skips))
 
-        pred_loss = criterion(output, target_var)
+        pred_loss = criterion(output, target_var)  # (B,1)
 
         # re-weight gate rewards
-        normalized_alpha = args.alpha / len(gate_saved_actions)
-        # intermediate rewards for each gate
+        normalized_alpha = args.alpha / max(1, len(gate_saved_actions))
         for act in gate_saved_actions:
-            gate_rewards.append((1 - act.float()).data * normalized_alpha)
-        # pdb.set_trace()
-        # collect cumulative future rewards
-        R = - pred_loss.data
+            gate_rewards.append((1 - act.float()).detach() * normalized_alpha)
+
+        # retornos cumulativos (usa -pred_loss como baseline)
+        R = -pred_loss.detach()  # (B,1)
         cum_rewards = []
         for r in gate_rewards[::-1]:
             R = r + args.gamma * R
-            cum_rewards.insert(0, R)
+            cum_rewards.insert(0, R)  # mesma ordem de gate_saved_actions
 
-        # apply REINFORCE to each gate
-        # Pytorch 2.0 version. `reinforce` function got removed in Pytorch 3.0
-        for action, R in zip(gate_saved_actions, cum_rewards):
-             action.reinforce(args.rl_weight * R)
+        # ----- Policy gradient (substitui .reinforce removido) -----
+        # probs é a lista de distribuições por gate; ações salvas em gate_saved_actions
+        policy_terms = []
+        for action, reward, p in zip(gate_saved_actions, cum_rewards, probs):
+            # p: (B,2) ou (B,2) bi_prob; action: (B,)
+            logp = torch.log(torch.clamp(p, min=1e-8)).gather(1, action.view(-1, 1).long())  # (B,1)
+            policy_terms.append((reward * logp).mean())  # escalar
 
+        policy_loss = -sum(policy_terms) if len(policy_terms) > 0 else torch.zeros((), device=output.device)
 
-        total_loss = total_criterion(output, target_var)
+        total_loss = total_criterion(output, target_var) + args.rl_weight * policy_loss
 
         optimizer.zero_grad()
-        # optimize hybrid loss
-        torch.autograd.backward(gate_saved_actions + [total_loss])
+        total_loss.backward()
         optimizer.step()
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        total_rewards.update(cum_rewards[0].mean(), input.size(0))
-        total_losses.update(total_loss.mean().data[0], input.size(0))
-        losses.update(pred_loss.mean().data[0], input.size(0))
-        top1.update(prec1[0], input.size(0))
+        prec1, = accuracy(output, target, topk=(1,))
+        total_rewards.update(cum_rewards[0].mean().item() if len(cum_rewards) > 0 else 0.0, input.size(0))
+        total_losses.update(total_loss.mean().item(), input.size(0))
+        losses.update(pred_loss.mean().item(), input.size(0))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
-        total_gate_reward = sum([r.mean() for r in gate_rewards])
+        total_gate_reward = float(sum([r.mean().item() for r in gate_rewards])) if len(gate_rewards) > 0 else 0.0
 
         # clear saved actions and rewards
         del gate_saved_actions[:]
@@ -265,7 +268,8 @@ def run_training(args, tune_config={}, reporter=None):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if reporter: reporter(timesteps_total=i, neg_mean_loss=losses.val)
+        if reporter:
+            reporter(timesteps_total=i, neg_mean_loss=losses.val)
         # print log
         if i % args.print_freq == 0 or i == (args.iters - 1):
             logging.info("Iter: [{0}/{1}]\t"
@@ -316,9 +320,6 @@ def run_training(args, tune_config={}, reporter=None):
 
 def validate(args, test_loader, model):
     batch_time = AverageMeter()
-    losses = AverageMeter()
-    total_losses = AverageMeter()
-    bias_losses = AverageMeter()
     top1 = AverageMeter()
     skip_ratios = ListAverageMeter()
 
@@ -326,18 +327,17 @@ def validate(args, test_loader, model):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.cuda(async=True)
-        input_var = Variable(input, volatile=True).cuda()
-        target_var = Variable(target, volatile=True).cuda()
+        target = target.cuda(non_blocking=True)
+        with torch.no_grad():
+            output, masks, probs = model(input.cuda(non_blocking=True))
 
-        output, masks, probs = model(input_var)
-        skips = [mask.data.le(0.5).float().mean() for mask in masks]
+        skips = [mask.detach().le(0.5).float().mean().item() for mask in masks]
         if skip_ratios.len != len(skips):
             skip_ratios.set_len(len(skips))
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1[0], input.size(0))
+        prec1, = accuracy(output, target, topk=(1,))
+        top1.update(prec1.item(), input.size(0))
         skip_ratios.update(skips, input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
@@ -347,24 +347,14 @@ def validate(args, test_loader, model):
                 'Test: [{}/{}]\t'
                 'Time: {batch_time.val:.4f}({batch_time.avg:.4f})\t'
                 'Prec@1: {top1.val:.3f}({top1.avg:.3f})\t'.format(
-                    i, len(test_loader), batch_time=batch_time,
-                    loss=losses,
-                    total_loss=total_losses,
-                    bias_loss=bias_losses,
-                    top1=top1
+                    i, len(test_loader), batch_time=batch_time, top1=top1
                 )
             )
     logging.info(' * Prec@1 {top1.avg:.3f}'.format(top1=top1))
 
     skip_summaries = []
     for idx in range(skip_ratios.len):
-        # logging.info(
-        #     "{} layer skipping = {:.3f}".format(
-        #         idx,
-        #         skip_ratios.avg[idx],
-        #     )
-        # )
-        skip_summaries.append(1-skip_ratios.avg[idx])
+        skip_summaries.append(1 - skip_ratios.avg[idx])
     # compute `computational percentage`
     cp = ((sum(skip_summaries) + 1) / (len(skip_summaries) + 1)) * 100
     logging.info('*** Computation Percentage: {:.3f} %'.format(cp))
@@ -483,12 +473,10 @@ def accuracy(output, target, topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        correct_k = correct[:k].reshape(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
 
 if __name__ == '__main__':
     main()
-
-

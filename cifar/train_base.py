@@ -6,7 +6,6 @@ from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
 
 import os
 import shutil
@@ -17,12 +16,10 @@ import logging
 import models
 from data import *
 
-
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith('__')
                      and callable(models.__dict__[name])
                      )
-
 
 def parse_args():
     # hyper-parameters are from ResNet paper
@@ -68,7 +65,6 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-
 def main():
     args = parse_args()
     save_path = args.save_path = os.path.join(args.save_folder, args.arch)
@@ -92,7 +88,6 @@ def main():
         logging.info('start evaluating {} with checkpoints from {}'.format(
             args.arch, args.resume))
         test_model(args)
-
 
 def run_training(args):
     # create model
@@ -147,18 +142,17 @@ def run_training(args):
         # measuring data loading time
         data_time.update(time.time() - end)
 
-        target = target.squeeze().long().cuda(async=True)
-        input_var = Variable(input)
-        target_var = Variable(target)
+        target = target.squeeze().long().cuda(non_blocking=True)
+        input_var = input.cuda(non_blocking=True)
 
         # compute output
         output = model(input_var)
-        loss = criterion(output, target_var)
+        loss = criterion(output, target)
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        losses.update(loss.data[0], input.size(0))
-        top1.update(prec1[0], input.size(0))
+        prec1, = accuracy(output, target, topk=(1,))
+        losses.update(loss.item(), input.size(0))
+        top1.update(prec1.item(), input.size(0))
 
         # compute gradient and do SGD step
         optimizer.zero_grad()
@@ -184,7 +178,7 @@ def run_training(args):
                             top1=top1)
             )
 
-            # evaluate every 1000 steps
+        # evaluate every 1000 steps
         if (i % args.eval_every == 0 and i > 0) or (i == args.iters - 1):
             prec1 = validate(args, test_loader, model, criterion)
             is_best = prec1 > best_prec1
@@ -203,7 +197,6 @@ def run_training(args):
                                                           'checkpoint_latest'
                                                           '.pth.tar'))
 
-
 def validate(args, test_loader, model, criterion):
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -213,18 +206,16 @@ def validate(args, test_loader, model, criterion):
     model.eval()
     end = time.time()
     for i, (input, target) in enumerate(test_loader):
-        target = target.squeeze().long().cuda(async=True)
-        input_var = Variable(input, volatile=True)
-        target_var = Variable(target, volatile=True)
+        target = target.squeeze().long().cuda(non_blocking=True)
 
-        # compute output
-        output = model(input_var)
-        loss = criterion(output, target_var)
+        with torch.no_grad():
+            output = model(input.cuda(non_blocking=True))
+            loss = criterion(output, target)
 
         # measure accuracy and record loss
-        prec1, = accuracy(output.data, target, topk=(1,))
-        top1.update(prec1[0], input.size(0))
-        losses.update(loss.data[0], input.size(0))
+        prec1, = accuracy(output, target, topk=(1,))
+        top1.update(prec1.item(), input.size(0))
+        losses.update(loss.item(), input.size(0))
         batch_time.update(time.time() - end)
         end = time.time()
 
@@ -241,7 +232,6 @@ def validate(args, test_loader, model, criterion):
 
     logging.info(' * Prec@1 {top1.avg:.3f}'.format(top1=top1))
     return top1.avg
-
 
 def test_model(args):
     # create model
@@ -270,14 +260,12 @@ def test_model(args):
 
     validate(args, test_loader, model, criterion)
 
-
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
         save_path = os.path.dirname(filename)
         shutil.copyfile(filename, os.path.join(save_path,
                                                'model_best.pth.tar'))
-
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -297,7 +285,6 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
-
 def adjust_learning_rate(args, optimizer, _iter):
     """divide lr by 10 at 32k and 48k """
     if args.warm_up and (_iter < 400):
@@ -315,7 +302,6 @@ def adjust_learning_rate(args, optimizer, _iter):
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
-
 def accuracy(output, target, topk=(1,)):
     """Computes the precision@k for the specified values of k"""
     maxk = max(topk)
@@ -330,7 +316,6 @@ def accuracy(output, target, topk=(1,)):
         correct_k = correct[:k].view(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
-
 
 if __name__ == '__main__':
     main()
