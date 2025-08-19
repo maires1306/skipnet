@@ -143,7 +143,6 @@ def run_training(args, tune_config={}, reporter=None):
     vars(args).update(tune_config)
     # create model
     model = models.__dict__[args.arch](args.pretrained).cuda()
-    model = torch.nn.DataParallel(model).cuda()
 
     # extract gate actions and rewards
     if args.gate_type == 'ff':
@@ -365,7 +364,6 @@ def validate(args, test_loader, model):
 def test_model(args):
     # create model
     model = models.__dict__[args.arch](args.pretrained).cuda()
-    model = torch.nn.DataParallel(model)
 
     if args.resume:
         if os.path.isfile(args.resume):

@@ -105,7 +105,6 @@ def main():
 def run_training(args):
     # create model
     model = models.__dict__[args.arch](args.pretrained)
-    model = torch.nn.DataParallel(model).cuda()
 
     best_prec1 = 0
 
@@ -286,7 +285,6 @@ def validate(args, test_loader, model, criterion):
 def test_model(args):
     # create model
     model = models.__dict__[args.arch](args.pretrained)
-    model = torch.nn.DataParallel(model).cuda()
 
     if args.resume:
         if os.path.isfile(args.resume):
