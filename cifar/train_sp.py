@@ -183,7 +183,7 @@ def run_training(args):
 
         # repackage hidden units for RNN Gate
         if args.gate_type == 'rnn':
-            model.module.control.repackage_hidden()
+            model.control.repackage_hidden()
 
         batch_time.update(time.time() - end)
         end = time.time()
