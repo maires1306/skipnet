@@ -104,7 +104,7 @@ def main():
 
 def run_training(args):
     # create model
-    model = models.__dict__[args.arch](args.pretrained)
+    model = models.__dict__[args.arch](args.pretrained).cuda()
 
     best_prec1 = 0
 
