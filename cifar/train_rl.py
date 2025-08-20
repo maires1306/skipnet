@@ -146,11 +146,11 @@ def run_training(args, tune_config={}, reporter=None):
 
     # extract gate actions and rewards
     if args.gate_type == 'ff':
-        gate_saved_actions = model.module.saved_actions
-        gate_rewards = model.module.rewards
+        gate_saved_actions = model.saved_actions
+        gate_rewards = model.rewards
     elif args.gate_type == 'rnn':
-        gate_saved_actions = model.module.control.saved_actions
-        gate_rewards = model.module.control.rewards
+        gate_saved_actions = model.control.saved_actions
+        gate_rewards = model.control.rewards
 
     best_prec1 = 0
 
