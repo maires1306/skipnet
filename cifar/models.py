@@ -119,6 +119,75 @@ def cifar10_resnet_110(pretrained=False, **kwargs):
     return model
 
 ########################################
+# ResNet com máscara manual (inference)
+########################################
+
+class ResNetWithMask(nn.Module):
+    """ResNet com forward que aceita uma máscara fixa de blocos a executar/pular"""
+    def __init__(self, block, layers, num_classes=10):
+        super(ResNetWithMask, self).__init__()
+        self.inplanes = 16
+        self.conv1 = conv3x3(3, 16)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.relu = nn.ReLU(inplace=True)
+
+        self.layer1 = self._make_layer(block, 16, layers[0])
+        self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
+
+        self.avgpool = nn.AvgPool2d(8)
+        self.fc = nn.Linear(64 * block.expansion, num_classes)
+
+    def _make_layer(self, block, planes, blocks, stride=1):
+        downsample = None
+        if stride != 1 or self.inplanes != planes * block.expansion:
+            downsample = nn.Sequential(
+                nn.Conv2d(self.inplanes, planes * block.expansion,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes * block.expansion),
+            )
+        layers = []
+        layers.append(block(self.inplanes, planes, stride, downsample))
+        self.inplanes = planes * block.expansion
+        for _ in range(1, blocks):
+            layers.append(block(self.inplanes, planes))
+        return nn.ModuleList(layers)
+
+    def forward_layer_group(self, x, layers, mask_group):
+        for block, m in zip(layers, mask_group):
+            if m == 1:   
+                x = block(x)
+            else:        
+                if block.downsample is not None:
+                    x = block.downsample(x) 
+        return x
+
+    def forward(self, x, mask=None):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+
+        n1, n2, n3 = len(self.layer1), len(self.layer2), len(self.layer3)
+        total_blocks = n1+n2+n3
+        if mask is None:
+            mask = [1]*total_blocks
+
+        idx = 0
+        x = self.forward_layer_group(x, self.layer1, mask[idx:idx+n1]); idx += n1
+        x = self.forward_layer_group(x, self.layer2, mask[idx:idx+n2]); idx += n2
+        x = self.forward_layer_group(x, self.layer3, mask[idx:idx+n3])
+
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+def cifar10_resnet_38_withmask(pretrained=False, **kwargs):
+    model = ResNetWithMask(BasicBlock, [6, 6, 6], num_classes=10)
+    return model
+
+
+########################################
 # SkipNet+SP with Feedforward Gate     #
 ########################################
 
