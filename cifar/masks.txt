@@ -1,0 +1,60 @@
+# 1. baseline (executa todos os blocos)
+1 1 1 1 1 1  1 1 1 1 1 1  1 1 1 1 1 1
+
+# 2. tudo desligado
+0 0 0 0 0 0  0 0 0 0 0 0  0 0 0 0 0 0
+
+# 3. alternando (1010…)
+1 0 1 0 1 0  1 0 1 0 1 0  1 0 1 0 1 0
+
+# 4. alternando (0101…)
+0 1 0 1 0 1  0 1 0 1 0 1  0 1 0 1 0 1
+
+# 5. primeira metade ativa, segunda desligada
+1 1 1 1 1 1  1 1 1 0 0 0  0 0 0 0 0 0
+
+# 6. primeira metade desligada, segunda ativa
+0 0 0 0 0 0  0 0 0 1 1 1  1 1 1 1 1 1
+
+# 7. apenas pares
+0 1 0 1 0 1  0 1 0 1 0 1  0 1 0 1 0 1
+
+# 8. apenas ímpares
+1 0 1 0 1 0  1 0 1 0 1 0  1 0 1 0 1 0
+
+# 9. só 3 primeiros de cada grupo
+1 1 1 0 0 0  1 1 1 0 0 0  1 1 1 0 0 0
+
+# 10. só 3 últimos de cada grupo
+0 0 0 1 1 1  0 0 0 1 1 1  0 0 0 1 1 1
+
+# 11. grupo1 ligado, outros desligados
+1 1 1 1 1 1  0 0 0 0 0 0  0 0 0 0 0 0
+
+# 12. grupo2 ligado, outros desligados
+0 0 0 0 0 0  1 1 1 1 1 1  0 0 0 0 0 0
+
+# 13. grupo3 ligado, outros desligados
+0 0 0 0 0 0  0 0 0 0 0 0  1 1 1 1 1 1
+
+# 14. 2 blocos sim, 2 não (2200…)
+1 1 0 0 1 1  0 0 1 1 0 0  1 1 0 0 1 1
+
+# 15. 4 primeiros ligados, resto desligado
+1 1 1 1 0 0  0 0 0 0 0 0  0 0 0 0 0 0
+
+# 16. 4 últimos ligados, resto desligado
+0 0 0 0 0 0  0 0 0 0 0 0  1 1 1 1 0 0
+
+# 17. só 1 bloco ativo em cada grupo
+1 0 0 0 0 0  1 0 0 0 0 0  1 0 0 0 0 0
+
+# 18. só último bloco de cada grupo ativo
+0 0 0 0 0 1  0 0 0 0 0 1  0 0 0 0 0 1
+
+# 19. padrão diagonal (1, depois 2, depois 3…)
+1 0 0 0 0 0  0 1 0 0 0 0  0 0 1 0 0 0
+
+# 20. padrão cruzado (primeiro e último de cada grupo)
+1 0 0 0 0 1  1 0 0 0 0 1  1 0 0 0 0 1
+

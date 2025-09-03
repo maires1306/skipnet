@@ -1,0 +1,463 @@
+nohup: ignoring input
+
+=== Treinando com mask_00_exec100p (18/18 blocos ativos) ===
+[mask_00_exec100p] epoch 1/20 | train_loss 0.0106 acc 99.71 | val_loss 0.3585 acc 92.57 | 8.2s
+[mask_00_exec100p] epoch 2/20 | train_loss 0.0111 acc 99.67 | val_loss 0.3459 acc 92.76 | 7.9s
+[mask_00_exec100p] epoch 3/20 | train_loss 0.0109 acc 99.73 | val_loss 0.3496 acc 92.49 | 8.0s
+[mask_00_exec100p] epoch 4/20 | train_loss 0.0117 acc 99.66 | val_loss 0.3592 acc 92.54 | 7.8s
+[mask_00_exec100p] epoch 5/20 | train_loss 0.0116 acc 99.69 | val_loss 0.3564 acc 92.53 | 8.1s
+[mask_00_exec100p] epoch 6/20 | train_loss 0.0125 acc 99.64 | val_loss 0.3607 acc 92.46 | 8.1s
+[mask_00_exec100p] epoch 7/20 | train_loss 0.0109 acc 99.67 | val_loss 0.3609 acc 92.78 | 8.2s
+[mask_00_exec100p] epoch 8/20 | train_loss 0.0137 acc 99.63 | val_loss 0.3544 acc 92.88 | 8.1s
+[mask_00_exec100p] epoch 9/20 | train_loss 0.0116 acc 99.65 | val_loss 0.3478 acc 92.44 | 8.0s
+[mask_00_exec100p] epoch 10/20 | train_loss 0.0121 acc 99.64 | val_loss 0.3668 acc 92.27 | 7.8s
+[mask_00_exec100p] epoch 11/20 | train_loss 0.0123 acc 99.61 | val_loss 0.3745 acc 92.42 | 7.9s
+[mask_00_exec100p] epoch 12/20 | train_loss 0.0129 acc 99.63 | val_loss 0.3674 acc 92.35 | 8.0s
+[mask_00_exec100p] epoch 13/20 | train_loss 0.0113 acc 99.66 | val_loss 0.3512 acc 92.68 | 7.9s
+[mask_00_exec100p] epoch 14/20 | train_loss 0.0116 acc 99.63 | val_loss 0.3523 acc 92.72 | 7.9s
+[mask_00_exec100p] epoch 15/20 | train_loss 0.0115 acc 99.67 | val_loss 0.3598 acc 92.59 | 7.9s
+[mask_00_exec100p] epoch 16/20 | train_loss 0.0104 acc 99.72 | val_loss 0.3680 acc 92.53 | 8.0s
+[mask_00_exec100p] epoch 17/20 | train_loss 0.0104 acc 99.70 | val_loss 0.3559 acc 92.79 | 8.0s
+[mask_00_exec100p] epoch 18/20 | train_loss 0.0115 acc 99.66 | val_loss 0.3535 acc 92.74 | 7.9s
+[mask_00_exec100p] epoch 19/20 | train_loss 0.0098 acc 99.72 | val_loss 0.3565 acc 92.68 | 7.7s
+[mask_00_exec100p] epoch 20/20 | train_loss 0.0107 acc 99.70 | val_loss 0.3604 acc 92.77 | 7.9s
+[mask_00_exec100p] Fim. Best Val Acc = 92.88% | dir=save_mask_sweep/20250902_230826_mask_00_exec100p
+
+=== Treinando com mask_01_exec00p (0/18 blocos ativos) ===
+[mask_01_exec00p] epoch 1/20 | train_loss 1.9985 acc 25.42 | val_loss 1.9360 acc 27.77 | 7.3s
+[mask_01_exec00p] epoch 2/20 | train_loss 1.9265 acc 28.26 | val_loss 1.9187 acc 27.31 | 7.7s
+[mask_01_exec00p] epoch 3/20 | train_loss 1.8909 acc 29.15 | val_loss 1.8500 acc 30.95 | 7.8s
+[mask_01_exec00p] epoch 4/20 | train_loss 1.8599 acc 30.29 | val_loss 1.9569 acc 27.51 | 7.8s
+[mask_01_exec00p] epoch 5/20 | train_loss 1.8385 acc 30.77 | val_loss 1.8157 acc 31.80 | 7.1s
+[mask_01_exec00p] epoch 6/20 | train_loss 1.8296 acc 31.15 | val_loss 1.7929 acc 32.41 | 7.7s
+[mask_01_exec00p] epoch 7/20 | train_loss 1.8213 acc 31.73 | val_loss 1.8511 acc 31.00 | 7.8s
+[mask_01_exec00p] epoch 8/20 | train_loss 1.8185 acc 31.64 | val_loss 1.8573 acc 31.60 | 7.2s
+[mask_01_exec00p] epoch 9/20 | train_loss 1.8110 acc 31.78 | val_loss 1.7897 acc 32.96 | 7.6s
+[mask_01_exec00p] epoch 10/20 | train_loss 1.8042 acc 32.14 | val_loss 1.7807 acc 33.70 | 7.6s
+[mask_01_exec00p] epoch 11/20 | train_loss 1.7992 acc 32.35 | val_loss 1.8508 acc 30.90 | 7.7s
+[mask_01_exec00p] epoch 12/20 | train_loss 1.7886 acc 32.49 | val_loss 1.7615 acc 33.93 | 7.9s
+[mask_01_exec00p] epoch 13/20 | train_loss 1.7863 acc 32.76 | val_loss 1.8264 acc 31.60 | 7.8s
+[mask_01_exec00p] epoch 14/20 | train_loss 1.7805 acc 32.80 | val_loss 1.7547 acc 34.28 | 7.5s
+[mask_01_exec00p] epoch 15/20 | train_loss 1.7734 acc 33.42 | val_loss 1.7727 acc 33.24 | 7.9s
+[mask_01_exec00p] epoch 16/20 | train_loss 1.7691 acc 33.31 | val_loss 1.7265 acc 35.02 | 7.9s
+[mask_01_exec00p] epoch 17/20 | train_loss 1.7731 acc 33.36 | val_loss 1.7715 acc 33.35 | 7.5s
+[mask_01_exec00p] epoch 18/20 | train_loss 1.7726 acc 33.02 | val_loss 1.7947 acc 32.63 | 7.7s
+[mask_01_exec00p] epoch 19/20 | train_loss 1.7721 acc 33.25 | val_loss 1.7970 acc 33.63 | 7.4s
+[mask_01_exec00p] epoch 20/20 | train_loss 1.7699 acc 33.54 | val_loss 1.7663 acc 34.49 | 7.8s
+[mask_01_exec00p] Fim. Best Val Acc = 35.02% | dir=save_mask_sweep/20250902_230826_mask_01_exec00p
+
+=== Treinando com mask_02_exec50p (9/18 blocos ativos) ===
+[mask_02_exec50p] epoch 1/20 | train_loss 0.5355 acc 83.61 | val_loss 0.3925 acc 86.78 | 8.0s
+[mask_02_exec50p] epoch 2/20 | train_loss 0.2858 acc 90.66 | val_loss 0.3588 acc 87.79 | 7.5s
+[mask_02_exec50p] epoch 3/20 | train_loss 0.2288 acc 92.40 | val_loss 0.3627 acc 87.99 | 7.9s
+[mask_02_exec50p] epoch 4/20 | train_loss 0.2010 acc 93.30 | val_loss 0.3417 acc 88.69 | 7.8s
+[mask_02_exec50p] epoch 5/20 | train_loss 0.1789 acc 93.93 | val_loss 0.3227 acc 89.74 | 7.7s
+[mask_02_exec50p] epoch 6/20 | train_loss 0.1646 acc 94.38 | val_loss 0.3346 acc 89.23 | 7.9s
+[mask_02_exec50p] epoch 7/20 | train_loss 0.1560 acc 94.52 | val_loss 0.3340 acc 89.87 | 7.7s
+[mask_02_exec50p] epoch 8/20 | train_loss 0.1440 acc 95.18 | val_loss 0.3205 acc 89.85 | 7.3s
+[mask_02_exec50p] epoch 9/20 | train_loss 0.1378 acc 95.29 | val_loss 0.3300 acc 89.66 | 7.7s
+[mask_02_exec50p] epoch 10/20 | train_loss 0.1337 acc 95.34 | val_loss 0.3454 acc 89.60 | 7.6s
+[mask_02_exec50p] epoch 11/20 | train_loss 0.1274 acc 95.55 | val_loss 0.3392 acc 89.90 | 7.7s
+[mask_02_exec50p] epoch 12/20 | train_loss 0.1245 acc 95.74 | val_loss 0.3289 acc 90.21 | 7.6s
+[mask_02_exec50p] epoch 13/20 | train_loss 0.1167 acc 95.91 | val_loss 0.3384 acc 90.40 | 7.8s
+[mask_02_exec50p] epoch 14/20 | train_loss 0.1100 acc 96.23 | val_loss 0.3447 acc 90.09 | 7.9s
+[mask_02_exec50p] epoch 15/20 | train_loss 0.1077 acc 96.44 | val_loss 0.3688 acc 89.40 | 7.8s
+[mask_02_exec50p] epoch 16/20 | train_loss 0.1094 acc 96.24 | val_loss 0.3617 acc 89.76 | 7.8s
+[mask_02_exec50p] epoch 17/20 | train_loss 0.1019 acc 96.46 | val_loss 0.3612 acc 89.87 | 7.2s
+[mask_02_exec50p] epoch 18/20 | train_loss 0.1016 acc 96.45 | val_loss 0.3431 acc 90.41 | 7.4s
+[mask_02_exec50p] epoch 19/20 | train_loss 0.0976 acc 96.62 | val_loss 0.3497 acc 90.17 | 7.4s
+[mask_02_exec50p] epoch 20/20 | train_loss 0.0939 acc 96.73 | val_loss 0.3568 acc 89.89 | 7.6s
+[mask_02_exec50p] Fim. Best Val Acc = 90.41% | dir=save_mask_sweep/20250902_230826_mask_02_exec50p
+
+=== Treinando com mask_03_exec50p (9/18 blocos ativos) ===
+[mask_03_exec50p] epoch 1/20 | train_loss 0.7516 acc 76.28 | val_loss 0.5229 acc 82.88 | 7.9s
+[mask_03_exec50p] epoch 2/20 | train_loss 0.3847 acc 86.55 | val_loss 0.4504 acc 85.23 | 7.8s
+[mask_03_exec50p] epoch 3/20 | train_loss 0.3182 acc 88.98 | val_loss 0.4211 acc 86.31 | 7.5s
+[mask_03_exec50p] epoch 4/20 | train_loss 0.2843 acc 90.10 | val_loss 0.4073 acc 86.93 | 8.0s
+[mask_03_exec50p] epoch 5/20 | train_loss 0.2509 acc 91.20 | val_loss 0.3867 acc 87.53 | 7.3s
+[mask_03_exec50p] epoch 6/20 | train_loss 0.2376 acc 91.55 | val_loss 0.4052 acc 87.48 | 7.5s
+[mask_03_exec50p] epoch 7/20 | train_loss 0.2178 acc 92.34 | val_loss 0.4033 acc 87.68 | 7.9s
+[mask_03_exec50p] epoch 8/20 | train_loss 0.2076 acc 92.71 | val_loss 0.3947 acc 88.31 | 7.8s
+[mask_03_exec50p] epoch 9/20 | train_loss 0.2002 acc 92.98 | val_loss 0.3733 acc 88.36 | 7.8s
+[mask_03_exec50p] epoch 10/20 | train_loss 0.1918 acc 93.19 | val_loss 0.3695 acc 89.01 | 7.6s
+[mask_03_exec50p] epoch 11/20 | train_loss 0.1833 acc 93.53 | val_loss 0.3723 acc 88.76 | 7.1s
+[mask_03_exec50p] epoch 12/20 | train_loss 0.1751 acc 93.84 | val_loss 0.3960 acc 88.35 | 7.2s
+[mask_03_exec50p] epoch 13/20 | train_loss 0.1698 acc 94.09 | val_loss 0.3719 acc 89.04 | 7.9s
+[mask_03_exec50p] epoch 14/20 | train_loss 0.1635 acc 94.27 | val_loss 0.3684 acc 89.26 | 7.0s
+[mask_03_exec50p] epoch 15/20 | train_loss 0.1589 acc 94.34 | val_loss 0.3666 acc 89.34 | 7.6s
+[mask_03_exec50p] epoch 16/20 | train_loss 0.1553 acc 94.52 | val_loss 0.3645 acc 89.56 | 7.7s
+[mask_03_exec50p] epoch 17/20 | train_loss 0.1495 acc 94.72 | val_loss 0.3680 acc 89.35 | 7.8s
+[mask_03_exec50p] epoch 18/20 | train_loss 0.1455 acc 94.85 | val_loss 0.3727 acc 88.96 | 7.7s
+[mask_03_exec50p] epoch 19/20 | train_loss 0.1468 acc 94.81 | val_loss 0.3780 acc 89.32 | 6.9s
+[mask_03_exec50p] epoch 20/20 | train_loss 0.1409 acc 95.08 | val_loss 0.3770 acc 89.16 | 8.1s
+[mask_03_exec50p] Fim. Best Val Acc = 89.56% | dir=save_mask_sweep/20250902_230826_mask_03_exec50p
+
+=== Treinando com mask_04_exec50p (9/18 blocos ativos) ===
+[mask_04_exec50p] epoch 1/20 | train_loss 1.1850 acc 58.76 | val_loss 0.9381 acc 66.78 | 7.8s
+[mask_04_exec50p] epoch 2/20 | train_loss 0.8164 acc 71.59 | val_loss 0.7886 acc 72.02 | 7.2s
+[mask_04_exec50p] epoch 3/20 | train_loss 0.6882 acc 76.21 | val_loss 0.7128 acc 74.71 | 8.0s
+[mask_04_exec50p] epoch 4/20 | train_loss 0.6186 acc 78.74 | val_loss 0.7230 acc 75.39 | 7.5s
+[mask_04_exec50p] epoch 5/20 | train_loss 0.5677 acc 80.54 | val_loss 0.6133 acc 79.09 | 7.9s
+[mask_04_exec50p] epoch 6/20 | train_loss 0.5308 acc 81.62 | val_loss 0.6419 acc 78.22 | 7.8s
+[mask_04_exec50p] epoch 7/20 | train_loss 0.4994 acc 82.76 | val_loss 0.5900 acc 79.93 | 8.0s
+[mask_04_exec50p] epoch 8/20 | train_loss 0.4756 acc 83.71 | val_loss 0.5864 acc 80.19 | 7.7s
+[mask_04_exec50p] epoch 9/20 | train_loss 0.4536 acc 84.58 | val_loss 0.6142 acc 80.22 | 8.0s
+[mask_04_exec50p] epoch 10/20 | train_loss 0.4396 acc 84.85 | val_loss 0.5436 acc 82.07 | 7.9s
+[mask_04_exec50p] epoch 11/20 | train_loss 0.4254 acc 85.36 | val_loss 0.5110 acc 83.00 | 7.8s
+[mask_04_exec50p] epoch 12/20 | train_loss 0.4152 acc 85.67 | val_loss 0.6305 acc 79.78 | 7.5s
+[mask_04_exec50p] epoch 13/20 | train_loss 0.4018 acc 86.20 | val_loss 0.5203 acc 83.01 | 7.5s
+[mask_04_exec50p] epoch 14/20 | train_loss 0.3954 acc 86.44 | val_loss 0.5339 acc 82.21 | 7.8s
+[mask_04_exec50p] epoch 15/20 | train_loss 0.3836 acc 86.85 | val_loss 0.5338 acc 82.82 | 7.9s
+[mask_04_exec50p] epoch 16/20 | train_loss 0.3770 acc 86.97 | val_loss 0.5712 acc 82.01 | 7.6s
+[mask_04_exec50p] epoch 17/20 | train_loss 0.3706 acc 87.20 | val_loss 0.5381 acc 81.93 | 7.1s
+[mask_04_exec50p] epoch 18/20 | train_loss 0.3660 acc 87.37 | val_loss 0.5170 acc 83.93 | 7.7s
+[mask_04_exec50p] epoch 19/20 | train_loss 0.3560 acc 87.66 | val_loss 0.5683 acc 81.78 | 7.5s
+[mask_04_exec50p] epoch 20/20 | train_loss 0.3502 acc 87.89 | val_loss 0.5063 acc 83.53 | 8.0s
+[mask_04_exec50p] Fim. Best Val Acc = 83.93% | dir=save_mask_sweep/20250902_230826_mask_04_exec50p
+
+=== Treinando com mask_05_exec50p (9/18 blocos ativos) ===
+[mask_05_exec50p] epoch 1/20 | train_loss 1.9865 acc 33.65 | val_loss 1.5248 acc 44.18 | 7.5s
+[mask_05_exec50p] epoch 2/20 | train_loss 1.2986 acc 52.56 | val_loss 1.0016 acc 64.96 | 7.8s
+[mask_05_exec50p] epoch 3/20 | train_loss 0.8296 acc 70.78 | val_loss 0.7301 acc 74.93 | 7.3s
+[mask_05_exec50p] epoch 4/20 | train_loss 0.6230 acc 78.30 | val_loss 0.6115 acc 78.78 | 8.0s
+[mask_05_exec50p] epoch 5/20 | train_loss 0.5090 acc 81.95 | val_loss 0.5515 acc 81.86 | 7.7s
+[mask_05_exec50p] epoch 6/20 | train_loss 0.4417 acc 84.61 | val_loss 0.5272 acc 82.88 | 7.9s
+[mask_05_exec50p] epoch 7/20 | train_loss 0.3944 acc 86.05 | val_loss 0.5033 acc 83.73 | 6.7s
+[mask_05_exec50p] epoch 8/20 | train_loss 0.3526 acc 87.57 | val_loss 0.4736 acc 84.72 | 8.0s
+[mask_05_exec50p] epoch 9/20 | train_loss 0.3253 acc 88.67 | val_loss 0.4856 acc 84.66 | 7.1s
+[mask_05_exec50p] epoch 10/20 | train_loss 0.3010 acc 89.35 | val_loss 0.4608 acc 85.31 | 7.6s
+[mask_05_exec50p] epoch 11/20 | train_loss 0.2821 acc 89.99 | val_loss 0.4335 acc 86.39 | 7.8s
+[mask_05_exec50p] epoch 12/20 | train_loss 0.2640 acc 90.71 | val_loss 0.4537 acc 85.95 | 7.3s
+[mask_05_exec50p] epoch 13/20 | train_loss 0.2468 acc 91.19 | val_loss 0.4597 acc 86.07 | 7.9s
+[mask_05_exec50p] epoch 14/20 | train_loss 0.2375 acc 91.46 | val_loss 0.4531 acc 86.04 | 7.9s
+[mask_05_exec50p] epoch 15/20 | train_loss 0.2213 acc 92.17 | val_loss 0.4451 acc 87.51 | 8.0s
+[mask_05_exec50p] epoch 16/20 | train_loss 0.2089 acc 92.49 | val_loss 0.4241 acc 87.34 | 7.7s
+[mask_05_exec50p] epoch 17/20 | train_loss 0.2040 acc 92.71 | val_loss 0.4271 acc 86.93 | 8.0s
+[mask_05_exec50p] epoch 18/20 | train_loss 0.1936 acc 93.17 | val_loss 0.4234 acc 87.68 | 7.7s
+[mask_05_exec50p] epoch 19/20 | train_loss 0.1843 acc 93.44 | val_loss 0.4359 acc 87.88 | 6.9s
+[mask_05_exec50p] epoch 20/20 | train_loss 0.1792 acc 93.61 | val_loss 0.4220 acc 87.79 | 7.8s
+[mask_05_exec50p] Fim. Best Val Acc = 87.88% | dir=save_mask_sweep/20250902_230826_mask_05_exec50p
+
+=== Treinando com mask_06_exec50p (9/18 blocos ativos) ===
+[mask_06_exec50p] epoch 1/20 | train_loss 0.5549 acc 80.97 | val_loss 0.4484 acc 84.71 | 7.2s
+[mask_06_exec50p] epoch 2/20 | train_loss 0.3167 acc 89.05 | val_loss 0.4032 acc 86.73 | 7.6s
+[mask_06_exec50p] epoch 3/20 | train_loss 0.2676 acc 90.64 | val_loss 0.4355 acc 86.12 | 7.6s
+[mask_06_exec50p] epoch 4/20 | train_loss 0.2388 acc 91.60 | val_loss 0.3776 acc 87.94 | 7.2s
+[mask_06_exec50p] epoch 5/20 | train_loss 0.2171 acc 92.44 | val_loss 0.4074 acc 87.02 | 6.9s
+[mask_06_exec50p] epoch 6/20 | train_loss 0.2064 acc 92.76 | val_loss 0.4072 acc 87.62 | 7.7s
+[mask_06_exec50p] epoch 7/20 | train_loss 0.1936 acc 93.24 | val_loss 0.3720 acc 88.47 | 7.9s
+[mask_06_exec50p] epoch 8/20 | train_loss 0.1797 acc 93.75 | val_loss 0.3802 acc 88.26 | 7.8s
+[mask_06_exec50p] epoch 9/20 | train_loss 0.1700 acc 94.04 | val_loss 0.3728 acc 88.43 | 7.9s
+[mask_06_exec50p] epoch 10/20 | train_loss 0.1673 acc 94.17 | val_loss 0.3770 acc 88.82 | 7.7s
+[mask_06_exec50p] epoch 11/20 | train_loss 0.1596 acc 94.32 | val_loss 0.3560 acc 89.08 | 7.6s
+[mask_06_exec50p] epoch 12/20 | train_loss 0.1502 acc 94.79 | val_loss 0.4103 acc 88.33 | 7.4s
+[mask_06_exec50p] epoch 13/20 | train_loss 0.1505 acc 94.70 | val_loss 0.3772 acc 89.34 | 7.7s
+[mask_06_exec50p] epoch 14/20 | train_loss 0.1427 acc 94.92 | val_loss 0.3684 acc 89.39 | 7.9s
+[mask_06_exec50p] epoch 15/20 | train_loss 0.1408 acc 95.00 | val_loss 0.4103 acc 88.04 | 7.7s
+[mask_06_exec50p] epoch 16/20 | train_loss 0.1352 acc 95.16 | val_loss 0.3945 acc 88.90 | 7.3s
+[mask_06_exec50p] epoch 17/20 | train_loss 0.1357 acc 95.18 | val_loss 0.4218 acc 88.49 | 6.5s
+[mask_06_exec50p] epoch 18/20 | train_loss 0.1289 acc 95.41 | val_loss 0.4211 acc 88.46 | 8.0s
+[mask_06_exec50p] epoch 19/20 | train_loss 0.1229 acc 95.64 | val_loss 0.4037 acc 88.92 | 7.7s
+[mask_06_exec50p] epoch 20/20 | train_loss 0.1250 acc 95.54 | val_loss 0.3964 acc 89.00 | 7.9s
+[mask_06_exec50p] Fim. Best Val Acc = 89.39% | dir=save_mask_sweep/20250902_230826_mask_06_exec50p
+
+=== Treinando com mask_07_exec50p (9/18 blocos ativos) ===
+[mask_07_exec50p] epoch 1/20 | train_loss 0.3650 acc 87.48 | val_loss 0.3838 acc 87.59 | 7.9s
+[mask_07_exec50p] epoch 2/20 | train_loss 0.2221 acc 92.30 | val_loss 0.3721 acc 87.83 | 7.8s
+[mask_07_exec50p] epoch 3/20 | train_loss 0.1910 acc 93.41 | val_loss 0.3293 acc 89.43 | 7.8s
+[mask_07_exec50p] epoch 4/20 | train_loss 0.1691 acc 94.18 | val_loss 0.3459 acc 89.02 | 7.6s
+[mask_07_exec50p] epoch 5/20 | train_loss 0.1563 acc 94.53 | val_loss 0.3366 acc 89.41 | 7.0s
+[mask_07_exec50p] epoch 6/20 | train_loss 0.1485 acc 94.78 | val_loss 0.3209 acc 90.08 | 6.8s
+[mask_07_exec50p] epoch 7/20 | train_loss 0.1386 acc 95.21 | val_loss 0.3306 acc 89.87 | 7.6s
+[mask_07_exec50p] epoch 8/20 | train_loss 0.1311 acc 95.42 | val_loss 0.3417 acc 89.96 | 7.9s
+[mask_07_exec50p] epoch 9/20 | train_loss 0.1252 acc 95.67 | val_loss 0.3270 acc 90.23 | 7.7s
+[mask_07_exec50p] epoch 10/20 | train_loss 0.1191 acc 95.91 | val_loss 0.3426 acc 90.01 | 7.9s
+[mask_07_exec50p] epoch 11/20 | train_loss 0.1164 acc 95.96 | val_loss 0.3760 acc 89.24 | 7.9s
+[mask_07_exec50p] epoch 12/20 | train_loss 0.1132 acc 96.06 | val_loss 0.3514 acc 89.62 | 7.5s
+[mask_07_exec50p] epoch 13/20 | train_loss 0.1091 acc 96.18 | val_loss 0.3604 acc 89.48 | 7.9s
+[mask_07_exec50p] epoch 14/20 | train_loss 0.1043 acc 96.46 | val_loss 0.3403 acc 89.81 | 7.7s
+[mask_07_exec50p] epoch 15/20 | train_loss 0.0988 acc 96.59 | val_loss 0.3510 acc 89.87 | 7.7s
+[mask_07_exec50p] epoch 16/20 | train_loss 0.0980 acc 96.50 | val_loss 0.3699 acc 89.94 | 7.9s
+[mask_07_exec50p] epoch 17/20 | train_loss 0.0968 acc 96.65 | val_loss 0.3355 acc 90.57 | 7.7s
+[mask_07_exec50p] epoch 18/20 | train_loss 0.0898 acc 96.89 | val_loss 0.3958 acc 89.43 | 7.3s
+[mask_07_exec50p] epoch 19/20 | train_loss 0.0921 acc 96.78 | val_loss 0.3543 acc 89.86 | 7.5s
+[mask_07_exec50p] epoch 20/20 | train_loss 0.0896 acc 96.89 | val_loss 0.3441 acc 90.24 | 7.8s
+[mask_07_exec50p] Fim. Best Val Acc = 90.57% | dir=save_mask_sweep/20250902_230826_mask_07_exec50p
+
+=== Treinando com mask_08_exec50p (9/18 blocos ativos) ===
+[mask_08_exec50p] epoch 1/20 | train_loss 0.4838 acc 84.67 | val_loss 0.4090 acc 85.98 | 8.0s
+[mask_08_exec50p] epoch 2/20 | train_loss 0.3075 acc 89.70 | val_loss 0.3752 acc 87.52 | 7.8s
+[mask_08_exec50p] epoch 3/20 | train_loss 0.2599 acc 91.15 | val_loss 0.3747 acc 87.33 | 7.6s
+[mask_08_exec50p] epoch 4/20 | train_loss 0.2339 acc 91.99 | val_loss 0.3594 acc 88.15 | 7.0s
+[mask_08_exec50p] epoch 5/20 | train_loss 0.2114 acc 92.82 | val_loss 0.3452 acc 88.49 | 7.9s
+[mask_08_exec50p] epoch 6/20 | train_loss 0.1984 acc 93.18 | val_loss 0.3425 acc 88.94 | 7.0s
+[mask_08_exec50p] epoch 7/20 | train_loss 0.1891 acc 93.51 | val_loss 0.3426 acc 88.85 | 7.9s
+[mask_08_exec50p] epoch 8/20 | train_loss 0.1714 acc 94.25 | val_loss 0.3427 acc 88.95 | 7.7s
+[mask_08_exec50p] epoch 9/20 | train_loss 0.1648 acc 94.32 | val_loss 0.3499 acc 88.93 | 7.8s
+[mask_08_exec50p] epoch 10/20 | train_loss 0.1576 acc 94.46 | val_loss 0.3456 acc 89.34 | 8.0s
+[mask_08_exec50p] epoch 11/20 | train_loss 0.1536 acc 94.63 | val_loss 0.3432 acc 89.91 | 7.8s
+[mask_08_exec50p] epoch 12/20 | train_loss 0.1473 acc 94.99 | val_loss 0.3249 acc 90.03 | 7.9s
+[mask_08_exec50p] epoch 13/20 | train_loss 0.1443 acc 94.99 | val_loss 0.3401 acc 89.93 | 6.9s
+[mask_08_exec50p] epoch 14/20 | train_loss 0.1380 acc 95.26 | val_loss 0.3356 acc 90.10 | 7.6s
+[mask_08_exec50p] epoch 15/20 | train_loss 0.1333 acc 95.38 | val_loss 0.3368 acc 89.79 | 8.2s
+[mask_08_exec50p] epoch 16/20 | train_loss 0.1242 acc 95.69 | val_loss 0.3277 acc 90.32 | 7.9s
+[mask_08_exec50p] epoch 17/20 | train_loss 0.1251 acc 95.63 | val_loss 0.3435 acc 90.06 | 8.0s
+[mask_08_exec50p] epoch 18/20 | train_loss 0.1223 acc 95.74 | val_loss 0.3554 acc 89.88 | 8.0s
+[mask_08_exec50p] epoch 19/20 | train_loss 0.1190 acc 95.80 | val_loss 0.3591 acc 89.97 | 7.2s
+[mask_08_exec50p] epoch 20/20 | train_loss 0.1173 acc 95.79 | val_loss 0.3641 acc 89.95 | 7.5s
+[mask_08_exec50p] Fim. Best Val Acc = 90.32% | dir=save_mask_sweep/20250902_230826_mask_08_exec50p
+
+=== Treinando com mask_09_exec50p (9/18 blocos ativos) ===
+[mask_09_exec50p] epoch 1/20 | train_loss 0.9121 acc 72.08 | val_loss 0.5986 acc 79.98 | 7.7s
+[mask_09_exec50p] epoch 2/20 | train_loss 0.4937 acc 82.99 | val_loss 0.5149 acc 83.37 | 7.9s
+[mask_09_exec50p] epoch 3/20 | train_loss 0.4111 acc 85.69 | val_loss 0.4287 acc 85.77 | 7.8s
+[mask_09_exec50p] epoch 4/20 | train_loss 0.3679 acc 87.33 | val_loss 0.4510 acc 85.13 | 7.8s
+[mask_09_exec50p] epoch 5/20 | train_loss 0.3368 acc 88.22 | val_loss 0.4387 acc 85.94 | 8.0s
+[mask_09_exec50p] epoch 6/20 | train_loss 0.3130 acc 88.96 | val_loss 0.4460 acc 85.91 | 7.6s
+[mask_09_exec50p] epoch 7/20 | train_loss 0.2933 acc 89.62 | val_loss 0.4217 acc 86.48 | 7.5s
+[mask_09_exec50p] epoch 8/20 | train_loss 0.2796 acc 90.25 | val_loss 0.4353 acc 86.32 | 7.5s
+[mask_09_exec50p] epoch 9/20 | train_loss 0.2618 acc 90.92 | val_loss 0.4055 acc 87.67 | 7.9s
+[mask_09_exec50p] epoch 10/20 | train_loss 0.2536 acc 91.04 | val_loss 0.3869 acc 87.60 | 7.8s
+[mask_09_exec50p] epoch 11/20 | train_loss 0.2457 acc 91.33 | val_loss 0.4309 acc 86.79 | 7.9s
+[mask_09_exec50p] epoch 12/20 | train_loss 0.2307 acc 91.85 | val_loss 0.3848 acc 88.02 | 7.8s
+[mask_09_exec50p] epoch 13/20 | train_loss 0.2316 acc 91.84 | val_loss 0.3745 acc 88.48 | 7.6s
+[mask_09_exec50p] epoch 14/20 | train_loss 0.2208 acc 92.22 | val_loss 0.3976 acc 88.26 | 7.5s
+[mask_09_exec50p] epoch 15/20 | train_loss 0.2123 acc 92.48 | val_loss 0.3672 acc 88.83 | 7.9s
+[mask_09_exec50p] epoch 16/20 | train_loss 0.2085 acc 92.58 | val_loss 0.3805 acc 88.59 | 7.9s
+[mask_09_exec50p] epoch 17/20 | train_loss 0.2028 acc 92.81 | val_loss 0.3614 acc 88.99 | 7.9s
+[mask_09_exec50p] epoch 18/20 | train_loss 0.1936 acc 93.25 | val_loss 0.3938 acc 88.06 | 7.8s
+[mask_09_exec50p] epoch 19/20 | train_loss 0.1952 acc 92.99 | val_loss 0.3772 acc 88.57 | 7.5s
+[mask_09_exec50p] epoch 20/20 | train_loss 0.1913 acc 93.28 | val_loss 0.3843 acc 88.30 | 7.6s
+[mask_09_exec50p] Fim. Best Val Acc = 88.99% | dir=save_mask_sweep/20250902_230826_mask_09_exec50p
+
+=== Treinando com mask_10_exec33p (6/18 blocos ativos) ===
+[mask_10_exec33p] epoch 1/20 | train_loss 1.4893 acc 46.02 | val_loss 1.4579 acc 47.55 | 7.9s
+[mask_10_exec33p] epoch 2/20 | train_loss 1.2469 acc 55.08 | val_loss 1.2386 acc 55.88 | 7.9s
+[mask_10_exec33p] epoch 3/20 | train_loss 1.1120 acc 60.12 | val_loss 1.3799 acc 54.77 | 7.7s
+[mask_10_exec33p] epoch 4/20 | train_loss 1.0280 acc 63.40 | val_loss 1.4329 acc 52.55 | 7.7s
+[mask_10_exec33p] epoch 5/20 | train_loss 0.9700 acc 65.48 | val_loss 1.1154 acc 62.02 | 7.2s
+[mask_10_exec33p] epoch 6/20 | train_loss 0.9254 acc 67.42 | val_loss 0.9876 acc 66.07 | 7.4s
+[mask_10_exec33p] epoch 7/20 | train_loss 0.8914 acc 68.66 | val_loss 1.0706 acc 62.85 | 7.8s
+[mask_10_exec33p] epoch 8/20 | train_loss 0.8664 acc 69.31 | val_loss 1.0682 acc 64.07 | 6.4s
+[mask_10_exec33p] epoch 9/20 | train_loss 0.8409 acc 70.30 | val_loss 1.7542 acc 52.34 | 7.7s
+[mask_10_exec33p] epoch 10/20 | train_loss 0.8226 acc 70.91 | val_loss 1.2131 acc 60.15 | 7.6s
+[mask_10_exec33p] epoch 11/20 | train_loss 0.8001 acc 71.87 | val_loss 1.2339 acc 60.63 | 7.7s
+[mask_10_exec33p] epoch 12/20 | train_loss 0.7855 acc 72.40 | val_loss 0.9453 acc 67.20 | 6.4s
+[mask_10_exec33p] epoch 13/20 | train_loss 0.7667 acc 72.97 | val_loss 1.2912 acc 61.90 | 8.0s
+[mask_10_exec33p] epoch 14/20 | train_loss 0.7525 acc 73.46 | val_loss 1.0192 acc 67.19 | 7.8s
+[mask_10_exec33p] epoch 15/20 | train_loss 0.7388 acc 74.19 | val_loss 0.9085 acc 69.38 | 7.5s
+[mask_10_exec33p] epoch 16/20 | train_loss 0.7300 acc 74.58 | val_loss 1.7249 acc 55.22 | 7.0s
+[mask_10_exec33p] epoch 17/20 | train_loss 0.7171 acc 74.92 | val_loss 0.9065 acc 68.83 | 7.3s
+[mask_10_exec33p] epoch 18/20 | train_loss 0.7055 acc 75.42 | val_loss 1.4986 acc 57.35 | 6.3s
+[mask_10_exec33p] epoch 19/20 | train_loss 0.6963 acc 75.60 | val_loss 1.0119 acc 68.07 | 7.5s
+[mask_10_exec33p] epoch 20/20 | train_loss 0.6889 acc 75.74 | val_loss 0.9672 acc 66.40 | 7.3s
+[mask_10_exec33p] Fim. Best Val Acc = 69.38% | dir=save_mask_sweep/20250902_230826_mask_10_exec33p
+
+=== Treinando com mask_11_exec33p (6/18 blocos ativos) ===
+[mask_11_exec33p] epoch 1/20 | train_loss 1.1248 acc 60.80 | val_loss 1.0288 acc 65.83 | 7.4s
+[mask_11_exec33p] epoch 2/20 | train_loss 0.7586 acc 73.67 | val_loss 0.8603 acc 71.29 | 7.9s
+[mask_11_exec33p] epoch 3/20 | train_loss 0.6523 acc 77.48 | val_loss 0.7030 acc 75.67 | 7.2s
+[mask_11_exec33p] epoch 4/20 | train_loss 0.5931 acc 79.60 | val_loss 0.7248 acc 75.38 | 4.6s
+[mask_11_exec33p] epoch 5/20 | train_loss 0.5602 acc 80.70 | val_loss 0.5876 acc 79.79 | 7.8s
+[mask_11_exec33p] epoch 6/20 | train_loss 0.5286 acc 81.82 | val_loss 0.6146 acc 79.80 | 7.7s
+[mask_11_exec33p] epoch 7/20 | train_loss 0.5033 acc 82.61 | val_loss 0.5734 acc 80.92 | 7.9s
+[mask_11_exec33p] epoch 8/20 | train_loss 0.4854 acc 83.38 | val_loss 0.6014 acc 80.58 | 6.0s
+[mask_11_exec33p] epoch 9/20 | train_loss 0.4713 acc 83.68 | val_loss 0.6269 acc 79.96 | 7.1s
+[mask_11_exec33p] epoch 10/20 | train_loss 0.4601 acc 84.09 | val_loss 0.5425 acc 82.27 | 6.2s
+[mask_11_exec33p] epoch 11/20 | train_loss 0.4494 acc 84.53 | val_loss 0.5627 acc 81.64 | 7.4s
+[mask_11_exec33p] epoch 12/20 | train_loss 0.4327 acc 85.04 | val_loss 0.5607 acc 81.48 | 7.8s
+[mask_11_exec33p] epoch 13/20 | train_loss 0.4222 acc 85.43 | val_loss 0.5203 acc 83.10 | 7.0s
+[mask_11_exec33p] epoch 14/20 | train_loss 0.4151 acc 85.81 | val_loss 0.5124 acc 83.37 | 7.2s
+[mask_11_exec33p] epoch 15/20 | train_loss 0.4099 acc 85.93 | val_loss 0.5242 acc 83.32 | 5.8s
+[mask_11_exec33p] epoch 16/20 | train_loss 0.3985 acc 86.25 | val_loss 0.5173 acc 82.72 | 7.6s
+[mask_11_exec33p] epoch 17/20 | train_loss 0.3962 acc 86.41 | val_loss 0.6253 acc 81.13 | 7.6s
+[mask_11_exec33p] epoch 18/20 | train_loss 0.3875 acc 86.66 | val_loss 0.5314 acc 82.90 | 7.3s
+[mask_11_exec33p] epoch 19/20 | train_loss 0.3803 acc 86.76 | val_loss 0.5074 acc 83.43 | 7.4s
+[mask_11_exec33p] epoch 20/20 | train_loss 0.3753 acc 87.04 | val_loss 0.5324 acc 82.74 | 7.8s
+[mask_11_exec33p] Fim. Best Val Acc = 83.43% | dir=save_mask_sweep/20250902_230826_mask_11_exec33p
+
+=== Treinando com mask_12_exec33p (6/18 blocos ativos) ===
+[mask_12_exec33p] epoch 1/20 | train_loss 1.4758 acc 49.95 | val_loss 1.0198 acc 64.69 | 8.0s
+[mask_12_exec33p] epoch 2/20 | train_loss 0.8332 acc 70.93 | val_loss 0.7072 acc 76.06 | 7.1s
+[mask_12_exec33p] epoch 3/20 | train_loss 0.6363 acc 77.73 | val_loss 0.6687 acc 77.84 | 7.9s
+[mask_12_exec33p] epoch 4/20 | train_loss 0.5542 acc 80.53 | val_loss 0.7059 acc 76.68 | 7.8s
+[mask_12_exec33p] epoch 5/20 | train_loss 0.4991 acc 82.68 | val_loss 0.5716 acc 81.02 | 7.3s
+[mask_12_exec33p] epoch 6/20 | train_loss 0.4558 acc 84.01 | val_loss 0.5510 acc 81.49 | 7.6s
+[mask_12_exec33p] epoch 7/20 | train_loss 0.4256 acc 85.11 | val_loss 0.5377 acc 82.45 | 7.4s
+[mask_12_exec33p] epoch 8/20 | train_loss 0.4009 acc 85.97 | val_loss 0.5348 acc 82.60 | 7.9s
+[mask_12_exec33p] epoch 9/20 | train_loss 0.3879 acc 86.31 | val_loss 0.5078 acc 83.22 | 6.2s
+[mask_12_exec33p] epoch 10/20 | train_loss 0.3636 acc 87.17 | val_loss 0.5038 acc 83.79 | 7.1s
+[mask_12_exec33p] epoch 11/20 | train_loss 0.3534 acc 87.62 | val_loss 0.5117 acc 83.56 | 7.4s
+[mask_12_exec33p] epoch 12/20 | train_loss 0.3329 acc 88.10 | val_loss 0.4990 acc 83.95 | 7.8s
+[mask_12_exec33p] epoch 13/20 | train_loss 0.3296 acc 88.42 | val_loss 0.5013 acc 84.28 | 7.3s
+[mask_12_exec33p] epoch 14/20 | train_loss 0.3184 acc 88.74 | val_loss 0.4790 acc 84.61 | 7.9s
+[mask_12_exec33p] epoch 15/20 | train_loss 0.3129 acc 88.93 | val_loss 0.4781 acc 84.89 | 5.6s
+[mask_12_exec33p] epoch 16/20 | train_loss 0.3010 acc 89.35 | val_loss 0.5017 acc 84.15 | 7.1s
+[mask_12_exec33p] epoch 17/20 | train_loss 0.2926 acc 89.65 | val_loss 0.5184 acc 84.24 | 6.5s
+[mask_12_exec33p] epoch 18/20 | train_loss 0.2875 acc 89.73 | val_loss 0.5170 acc 83.74 | 7.6s
+[mask_12_exec33p] epoch 19/20 | train_loss 0.2797 acc 90.17 | val_loss 0.4661 acc 85.71 | 7.2s
+[mask_12_exec33p] epoch 20/20 | train_loss 0.2704 acc 90.51 | val_loss 0.4870 acc 85.10 | 6.4s
+[mask_12_exec33p] Fim. Best Val Acc = 85.71% | dir=save_mask_sweep/20250902_230826_mask_12_exec33p
+
+=== Treinando com mask_13_exec55p (10/18 blocos ativos) ===
+[mask_13_exec55p] epoch 1/20 | train_loss 0.6563 acc 77.65 | val_loss 0.4892 acc 84.00 | 7.7s
+[mask_13_exec55p] epoch 2/20 | train_loss 0.3384 acc 88.09 | val_loss 0.4543 acc 85.35 | 7.8s
+[mask_13_exec55p] epoch 3/20 | train_loss 0.2841 acc 89.91 | val_loss 0.4055 acc 86.78 | 7.7s
+[mask_13_exec55p] epoch 4/20 | train_loss 0.2533 acc 91.09 | val_loss 0.4348 acc 86.93 | 7.5s
+[mask_13_exec55p] epoch 5/20 | train_loss 0.2267 acc 92.12 | val_loss 0.3824 acc 87.95 | 6.8s
+[mask_13_exec55p] epoch 6/20 | train_loss 0.2100 acc 92.53 | val_loss 0.3873 acc 88.24 | 7.8s
+[mask_13_exec55p] epoch 7/20 | train_loss 0.1972 acc 92.98 | val_loss 0.3579 acc 88.85 | 7.5s
+[mask_13_exec55p] epoch 8/20 | train_loss 0.1832 acc 93.53 | val_loss 0.3627 acc 88.86 | 7.2s
+[mask_13_exec55p] epoch 9/20 | train_loss 0.1738 acc 93.81 | val_loss 0.3847 acc 88.45 | 7.0s
+[mask_13_exec55p] epoch 10/20 | train_loss 0.1685 acc 93.97 | val_loss 0.3825 acc 88.48 | 7.6s
+[mask_13_exec55p] epoch 11/20 | train_loss 0.1577 acc 94.33 | val_loss 0.3572 acc 89.28 | 7.7s
+[mask_13_exec55p] epoch 12/20 | train_loss 0.1534 acc 94.53 | val_loss 0.3665 acc 89.28 | 7.7s
+[mask_13_exec55p] epoch 13/20 | train_loss 0.1429 acc 94.86 | val_loss 0.3573 acc 89.48 | 7.7s
+[mask_13_exec55p] epoch 14/20 | train_loss 0.1359 acc 95.15 | val_loss 0.3601 acc 89.33 | 7.7s
+[mask_13_exec55p] epoch 15/20 | train_loss 0.1386 acc 95.16 | val_loss 0.3698 acc 89.76 | 7.8s
+[mask_13_exec55p] epoch 16/20 | train_loss 0.1293 acc 95.43 | val_loss 0.3657 acc 89.79 | 7.8s
+[mask_13_exec55p] epoch 17/20 | train_loss 0.1269 acc 95.54 | val_loss 0.3691 acc 89.55 | 7.8s
+[mask_13_exec55p] epoch 18/20 | train_loss 0.1190 acc 95.75 | val_loss 0.3773 acc 89.35 | 7.9s
+[mask_13_exec55p] epoch 19/20 | train_loss 0.1150 acc 95.85 | val_loss 0.3704 acc 89.68 | 7.9s
+[mask_13_exec55p] epoch 20/20 | train_loss 0.1142 acc 95.93 | val_loss 0.3790 acc 89.76 | 7.2s
+[mask_13_exec55p] Fim. Best Val Acc = 89.79% | dir=save_mask_sweep/20250902_230826_mask_13_exec55p
+
+=== Treinando com mask_14_exec22p (4/18 blocos ativos) ===
+[mask_14_exec22p] epoch 1/20 | train_loss 1.3580 acc 50.91 | val_loss 1.2668 acc 54.36 | 8.0s
+[mask_14_exec22p] epoch 2/20 | train_loss 1.0413 acc 62.88 | val_loss 1.2315 acc 58.08 | 8.0s
+[mask_14_exec22p] epoch 3/20 | train_loss 0.9564 acc 65.96 | val_loss 1.0150 acc 65.02 | 8.0s
+[mask_14_exec22p] epoch 4/20 | train_loss 0.9060 acc 67.67 | val_loss 1.1950 acc 59.88 | 5.9s
+[mask_14_exec22p] epoch 5/20 | train_loss 0.8803 acc 69.13 | val_loss 1.0450 acc 63.85 | 7.3s
+[mask_14_exec22p] epoch 6/20 | train_loss 0.8630 acc 69.29 | val_loss 0.9251 acc 67.30 | 6.3s
+[mask_14_exec22p] epoch 7/20 | train_loss 0.8416 acc 70.20 | val_loss 1.0245 acc 66.57 | 7.4s
+[mask_14_exec22p] epoch 8/20 | train_loss 0.8249 acc 70.88 | val_loss 0.9363 acc 68.19 | 7.9s
+[mask_14_exec22p] epoch 9/20 | train_loss 0.8159 acc 71.13 | val_loss 0.9452 acc 66.93 | 6.6s
+[mask_14_exec22p] epoch 10/20 | train_loss 0.8042 acc 71.50 | val_loss 1.1351 acc 64.02 | 7.9s
+[mask_14_exec22p] epoch 11/20 | train_loss 0.7950 acc 71.89 | val_loss 1.0128 acc 66.12 | 7.1s
+[mask_14_exec22p] epoch 12/20 | train_loss 0.7906 acc 71.83 | val_loss 1.0072 acc 65.84 | 7.7s
+[mask_14_exec22p] epoch 13/20 | train_loss 0.7837 acc 72.42 | val_loss 0.8563 acc 69.87 | 7.2s
+[mask_14_exec22p] epoch 14/20 | train_loss 0.7713 acc 72.86 | val_loss 0.8603 acc 70.44 | 7.6s
+[mask_14_exec22p] epoch 15/20 | train_loss 0.7663 acc 72.86 | val_loss 0.8723 acc 70.75 | 7.5s
+[mask_14_exec22p] epoch 16/20 | train_loss 0.7633 acc 73.08 | val_loss 1.0086 acc 66.95 | 7.8s
+[mask_14_exec22p] epoch 17/20 | train_loss 0.7540 acc 73.28 | val_loss 0.9462 acc 67.43 | 7.2s
+[mask_14_exec22p] epoch 18/20 | train_loss 0.7479 acc 73.78 | val_loss 1.3863 acc 59.27 | 6.5s
+[mask_14_exec22p] epoch 19/20 | train_loss 0.7443 acc 73.95 | val_loss 0.8177 acc 71.37 | 7.9s
+[mask_14_exec22p] epoch 20/20 | train_loss 0.7379 acc 73.84 | val_loss 0.8530 acc 70.88 | 7.6s
+[mask_14_exec22p] Fim. Best Val Acc = 71.37% | dir=save_mask_sweep/20250902_230826_mask_14_exec22p
+
+=== Treinando com mask_15_exec22p (4/18 blocos ativos) ===
+[mask_15_exec22p] epoch 1/20 | train_loss 0.7029 acc 75.93 | val_loss 0.5846 acc 80.02 | 7.3s
+[mask_15_exec22p] epoch 2/20 | train_loss 0.4672 acc 83.96 | val_loss 0.5689 acc 80.65 | 7.8s
+[mask_15_exec22p] epoch 3/20 | train_loss 0.4266 acc 85.20 | val_loss 0.5726 acc 81.24 | 8.0s
+[mask_15_exec22p] epoch 4/20 | train_loss 0.4037 acc 86.03 | val_loss 0.5522 acc 82.03 | 7.6s
+[mask_15_exec22p] epoch 5/20 | train_loss 0.3817 acc 86.87 | val_loss 0.5067 acc 83.78 | 7.2s
+[mask_15_exec22p] epoch 6/20 | train_loss 0.3692 acc 87.11 | val_loss 0.5437 acc 81.81 | 7.9s
+[mask_15_exec22p] epoch 7/20 | train_loss 0.3577 acc 87.60 | val_loss 0.5184 acc 82.83 | 7.4s
+[mask_15_exec22p] epoch 8/20 | train_loss 0.3454 acc 88.09 | val_loss 0.4864 acc 84.33 | 7.8s
+[mask_15_exec22p] epoch 9/20 | train_loss 0.3406 acc 88.08 | val_loss 0.4820 acc 84.01 | 7.8s
+[mask_15_exec22p] epoch 10/20 | train_loss 0.3327 acc 88.39 | val_loss 0.5195 acc 83.26 | 6.5s
+[mask_15_exec22p] epoch 11/20 | train_loss 0.3175 acc 88.89 | val_loss 0.4897 acc 84.10 | 7.7s
+[mask_15_exec22p] epoch 12/20 | train_loss 0.3178 acc 88.88 | val_loss 0.4835 acc 84.21 | 6.4s
+[mask_15_exec22p] epoch 13/20 | train_loss 0.3086 acc 89.28 | val_loss 0.5214 acc 83.72 | 7.7s
+[mask_15_exec22p] epoch 14/20 | train_loss 0.3016 acc 89.45 | val_loss 0.4884 acc 84.42 | 7.8s
+[mask_15_exec22p] epoch 15/20 | train_loss 0.2957 acc 89.71 | val_loss 0.4920 acc 84.17 | 7.7s
+[mask_15_exec22p] epoch 16/20 | train_loss 0.2952 acc 89.51 | val_loss 0.4947 acc 84.10 | 7.8s
+[mask_15_exec22p] epoch 17/20 | train_loss 0.2828 acc 89.95 | val_loss 0.4970 acc 84.37 | 7.5s
+[mask_15_exec22p] epoch 18/20 | train_loss 0.2841 acc 89.97 | val_loss 0.4620 acc 85.12 | 7.8s
+[mask_15_exec22p] epoch 19/20 | train_loss 0.2761 acc 90.30 | val_loss 0.4687 acc 85.23 | 7.1s
+[mask_15_exec22p] epoch 20/20 | train_loss 0.2718 acc 90.42 | val_loss 0.5383 acc 83.32 | 7.0s
+[mask_15_exec22p] Fim. Best Val Acc = 85.23% | dir=save_mask_sweep/20250902_230826_mask_15_exec22p
+
+=== Treinando com mask_16_exec16p (3/18 blocos ativos) ===
+[mask_16_exec16p] epoch 1/20 | train_loss 1.1380 acc 60.75 | val_loss 0.9927 acc 65.69 | 6.8s
+[mask_16_exec16p] epoch 2/20 | train_loss 0.8899 acc 69.28 | val_loss 0.8595 acc 70.59 | 7.6s
+[mask_16_exec16p] epoch 3/20 | train_loss 0.7856 acc 72.86 | val_loss 0.8043 acc 72.59 | 6.4s
+[mask_16_exec16p] epoch 4/20 | train_loss 0.7277 acc 75.06 | val_loss 0.7731 acc 73.09 | 7.5s
+[mask_16_exec16p] epoch 5/20 | train_loss 0.6798 acc 76.75 | val_loss 0.7022 acc 75.34 | 7.8s
+[mask_16_exec16p] epoch 6/20 | train_loss 0.6484 acc 77.71 | val_loss 0.6765 acc 76.44 | 7.7s
+[mask_16_exec16p] epoch 7/20 | train_loss 0.6186 acc 78.78 | val_loss 0.6645 acc 77.25 | 8.0s
+[mask_16_exec16p] epoch 8/20 | train_loss 0.5977 acc 79.47 | val_loss 0.6151 acc 78.16 | 8.0s
+[mask_16_exec16p] epoch 9/20 | train_loss 0.5773 acc 80.15 | val_loss 0.6526 acc 77.66 | 7.8s
+[mask_16_exec16p] epoch 10/20 | train_loss 0.5595 acc 80.71 | val_loss 0.6419 acc 77.82 | 7.6s
+[mask_16_exec16p] epoch 11/20 | train_loss 0.5476 acc 81.24 | val_loss 0.6453 acc 78.36 | 7.9s
+[mask_16_exec16p] epoch 12/20 | train_loss 0.5358 acc 81.64 | val_loss 0.6444 acc 77.79 | 7.7s
+[mask_16_exec16p] epoch 13/20 | train_loss 0.5262 acc 81.97 | val_loss 0.5943 acc 79.92 | 7.7s
+[mask_16_exec16p] epoch 14/20 | train_loss 0.5138 acc 82.16 | val_loss 0.5906 acc 79.79 | 7.8s
+[mask_16_exec16p] epoch 15/20 | train_loss 0.4992 acc 83.03 | val_loss 0.5592 acc 80.71 | 6.3s
+[mask_16_exec16p] epoch 16/20 | train_loss 0.4934 acc 83.11 | val_loss 0.5649 acc 80.88 | 7.7s
+[mask_16_exec16p] epoch 17/20 | train_loss 0.4833 acc 83.51 | val_loss 0.5369 acc 82.01 | 7.0s
+[mask_16_exec16p] epoch 18/20 | train_loss 0.4758 acc 83.62 | val_loss 0.5594 acc 81.26 | 7.7s
+[mask_16_exec16p] epoch 19/20 | train_loss 0.4693 acc 84.02 | val_loss 0.5624 acc 81.07 | 7.2s
+[mask_16_exec16p] epoch 20/20 | train_loss 0.4628 acc 84.07 | val_loss 0.5264 acc 82.26 | 6.8s
+[mask_16_exec16p] Fim. Best Val Acc = 82.26% | dir=save_mask_sweep/20250902_230826_mask_16_exec16p
+
+=== Treinando com mask_17_exec16p (3/18 blocos ativos) ===
+[mask_17_exec16p] epoch 1/20 | train_loss 1.2612 acc 55.67 | val_loss 1.0496 acc 64.92 | 7.9s
+[mask_17_exec16p] epoch 2/20 | train_loss 0.8798 acc 69.23 | val_loss 0.8842 acc 70.11 | 7.6s
+[mask_17_exec16p] epoch 3/20 | train_loss 0.7616 acc 73.63 | val_loss 0.8121 acc 72.48 | 7.8s
+[mask_17_exec16p] epoch 4/20 | train_loss 0.7002 acc 75.65 | val_loss 0.7610 acc 74.04 | 8.0s
+[mask_17_exec16p] epoch 5/20 | train_loss 0.6563 acc 77.01 | val_loss 0.7475 acc 74.99 | 6.5s
+[mask_17_exec16p] epoch 6/20 | train_loss 0.6224 acc 78.40 | val_loss 0.8368 acc 72.71 | 7.9s
+[mask_17_exec16p] epoch 7/20 | train_loss 0.5962 acc 79.41 | val_loss 0.6777 acc 77.25 | 7.9s
+[mask_17_exec16p] epoch 8/20 | train_loss 0.5754 acc 79.96 | val_loss 0.6377 acc 78.62 | 7.3s
+[mask_17_exec16p] epoch 9/20 | train_loss 0.5591 acc 80.71 | val_loss 0.6192 acc 79.20 | 7.6s
+[mask_17_exec16p] epoch 10/20 | train_loss 0.5429 acc 81.23 | val_loss 0.6036 acc 80.00 | 7.8s
+[mask_17_exec16p] epoch 11/20 | train_loss 0.5304 acc 81.60 | val_loss 0.6226 acc 79.59 | 7.7s
+[mask_17_exec16p] epoch 12/20 | train_loss 0.5166 acc 82.21 | val_loss 0.6836 acc 77.60 | 7.8s
+[mask_17_exec16p] epoch 13/20 | train_loss 0.5076 acc 82.33 | val_loss 0.6200 acc 79.21 | 8.0s
+[mask_17_exec16p] epoch 14/20 | train_loss 0.4976 acc 82.99 | val_loss 0.5952 acc 80.38 | 7.9s
+[mask_17_exec16p] epoch 15/20 | train_loss 0.4905 acc 82.91 | val_loss 0.5808 acc 80.48 | 7.0s
+[mask_17_exec16p] epoch 16/20 | train_loss 0.4842 acc 83.39 | val_loss 0.5530 acc 81.30 | 6.7s
+[mask_17_exec16p] epoch 17/20 | train_loss 0.4737 acc 83.50 | val_loss 0.5658 acc 80.72 | 7.9s
+[mask_17_exec16p] epoch 18/20 | train_loss 0.4663 acc 83.81 | val_loss 0.5405 acc 81.64 | 7.6s
+[mask_17_exec16p] epoch 19/20 | train_loss 0.4617 acc 84.01 | val_loss 0.5379 acc 81.68 | 8.0s
+[mask_17_exec16p] epoch 20/20 | train_loss 0.4515 acc 84.44 | val_loss 0.5400 acc 81.77 | 7.6s
+[mask_17_exec16p] Fim. Best Val Acc = 81.77% | dir=save_mask_sweep/20250902_230826_mask_17_exec16p
+
+=== Treinando com mask_18_exec16p (3/18 blocos ativos) ===
+[mask_18_exec16p] epoch 1/20 | train_loss 1.1490 acc 59.18 | val_loss 0.8923 acc 69.67 | 7.9s
+[mask_18_exec16p] epoch 2/20 | train_loss 0.7892 acc 72.58 | val_loss 0.7568 acc 74.26 | 7.4s
+[mask_18_exec16p] epoch 3/20 | train_loss 0.6864 acc 76.15 | val_loss 0.6918 acc 76.69 | 8.0s
+[mask_18_exec16p] epoch 4/20 | train_loss 0.6341 acc 78.11 | val_loss 0.6862 acc 77.25 | 7.2s
+[mask_18_exec16p] epoch 5/20 | train_loss 0.5941 acc 79.58 | val_loss 0.6410 acc 78.00 | 7.8s
+[mask_18_exec16p] epoch 6/20 | train_loss 0.5700 acc 80.42 | val_loss 0.6021 acc 79.81 | 7.9s
+[mask_18_exec16p] epoch 7/20 | train_loss 0.5448 acc 81.57 | val_loss 0.5631 acc 80.97 | 6.9s
+[mask_18_exec16p] epoch 8/20 | train_loss 0.5270 acc 81.88 | val_loss 0.5920 acc 79.97 | 7.8s
+[mask_18_exec16p] epoch 9/20 | train_loss 0.5130 acc 82.46 | val_loss 0.5787 acc 80.44 | 6.9s
+[mask_18_exec16p] epoch 10/20 | train_loss 0.5015 acc 82.90 | val_loss 0.5777 acc 80.83 | 7.7s
+[mask_18_exec16p] epoch 11/20 | train_loss 0.4897 acc 83.04 | val_loss 0.5818 acc 80.74 | 7.2s
+[mask_18_exec16p] epoch 12/20 | train_loss 0.4768 acc 83.67 | val_loss 0.5335 acc 82.08 | 8.0s
+[mask_18_exec16p] epoch 13/20 | train_loss 0.4676 acc 83.95 | val_loss 0.5373 acc 82.18 | 7.3s
+[mask_18_exec16p] epoch 14/20 | train_loss 0.4591 acc 84.33 | val_loss 0.5542 acc 81.73 | 8.0s
+[mask_18_exec16p] epoch 15/20 | train_loss 0.4539 acc 84.33 | val_loss 0.4959 acc 83.46 | 7.7s
+[mask_18_exec16p] epoch 16/20 | train_loss 0.4466 acc 84.68 | val_loss 0.5386 acc 82.26 | 6.2s
+[mask_18_exec16p] epoch 17/20 | train_loss 0.4367 acc 84.94 | val_loss 0.5550 acc 81.41 | 8.0s
+[mask_18_exec16p] epoch 18/20 | train_loss 0.4314 acc 85.08 | val_loss 0.5812 acc 81.64 | 7.5s
+[mask_18_exec16p] epoch 19/20 | train_loss 0.4232 acc 85.58 | val_loss 0.5092 acc 83.37 | 7.9s
+[mask_18_exec16p] epoch 20/20 | train_loss 0.4201 acc 85.63 | val_loss 0.5271 acc 82.71 | 7.6s
+[mask_18_exec16p] Fim. Best Val Acc = 83.46% | dir=save_mask_sweep/20250902_230826_mask_18_exec16p
+
+=== Treinando com mask_19_exec33p (6/18 blocos ativos) ===
+[mask_19_exec33p] epoch 1/20 | train_loss 0.5928 acc 80.39 | val_loss 0.5453 acc 82.53 | 7.5s
+[mask_19_exec33p] epoch 2/20 | train_loss 0.4323 acc 85.10 | val_loss 0.4918 acc 83.87 | 7.6s
+[mask_19_exec33p] epoch 3/20 | train_loss 0.3873 acc 86.65 | val_loss 0.4603 acc 85.00 | 6.2s
+[mask_19_exec33p] epoch 4/20 | train_loss 0.3581 acc 87.77 | val_loss 0.4471 acc 85.67 | 6.9s
+[mask_19_exec33p] epoch 5/20 | train_loss 0.3421 acc 88.15 | val_loss 0.4312 acc 85.98 | 7.8s
+[mask_19_exec33p] epoch 6/20 | train_loss 0.3275 acc 88.61 | val_loss 0.4197 acc 85.95 | 7.8s
+[mask_19_exec33p] epoch 7/20 | train_loss 0.3143 acc 89.25 | val_loss 0.4137 acc 86.59 | 7.8s
+[mask_19_exec33p] epoch 8/20 | train_loss 0.2986 acc 89.58 | val_loss 0.4060 acc 86.91 | 7.6s
+[mask_19_exec33p] epoch 9/20 | train_loss 0.2922 acc 89.79 | val_loss 0.3955 acc 86.89 | 7.0s
+[mask_19_exec33p] epoch 10/20 | train_loss 0.2788 acc 90.30 | val_loss 0.3875 acc 87.27 | 7.5s
+[mask_19_exec33p] epoch 11/20 | train_loss 0.2724 acc 90.44 | val_loss 0.4096 acc 86.86 | 7.8s
+[mask_19_exec33p] epoch 12/20 | train_loss 0.2650 acc 90.81 | val_loss 0.4066 acc 87.27 | 7.4s
+[mask_19_exec33p] epoch 13/20 | train_loss 0.2560 acc 91.04 | val_loss 0.4227 acc 86.58 | 7.7s
+[mask_19_exec33p] epoch 14/20 | train_loss 0.2513 acc 91.29 | val_loss 0.3991 acc 87.32 | 7.9s
+[mask_19_exec33p] epoch 15/20 | train_loss 0.2419 acc 91.56 | val_loss 0.3746 acc 87.92 | 7.1s
+[mask_19_exec33p] epoch 16/20 | train_loss 0.2360 acc 91.76 | val_loss 0.4271 acc 86.40 | 5.7s
+[mask_19_exec33p] epoch 17/20 | train_loss 0.2306 acc 91.96 | val_loss 0.4037 acc 87.24 | 7.0s
+[mask_19_exec33p] epoch 18/20 | train_loss 0.2314 acc 91.92 | val_loss 0.3890 acc 87.28 | 5.7s
+[mask_19_exec33p] epoch 19/20 | train_loss 0.2232 acc 92.35 | val_loss 0.4279 acc 86.88 | 7.2s
+[mask_19_exec33p] epoch 20/20 | train_loss 0.2241 acc 92.16 | val_loss 0.3747 acc 88.05 | 6.6s
+[mask_19_exec33p] Fim. Best Val Acc = 88.05% | dir=save_mask_sweep/20250902_230826_mask_19_exec33p
+
+Sweep concluído ✅
