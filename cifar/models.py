@@ -216,7 +216,7 @@ class ResNetMasked(nn.Module):
         # máscara padrão = "executa tudo"
         total_blocks = len(self.layer1) + len(self.layer2) + len(self.layer3)
         mask_init = torch.ones(total_blocks, dtype=torch.uint8)
-        self.register_buffer("mask_bits", mask_init)  # fica no device do modelo
+        self.register_buffer("mask_bits", mask_init, persistent=False)
 
         # init igual ao da ResNet original
         for m in self.modules():
