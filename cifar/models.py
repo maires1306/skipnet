@@ -186,6 +186,109 @@ def cifar10_resnet_38_withmask(pretrained=False, **kwargs):
     model = ResNetWithMask(BasicBlock, [6, 6, 6], num_classes=10)
     return model
 
+########################################
+# ResNet "padrão" com máscara fixa p/ treino/inferência
+########################################
+
+class ResNetMasked(nn.Module):
+    """
+    Igual à ResNet de CIFAR, mas:
+      - layer1/layer2/layer3 são ModuleList (controle bloco a bloco)
+      - guarda uma máscara fixa (buffer) com 0/1 por bloco
+      - forward respeita a máscara: 1 = executa bloco; 0 = pula
+        (se o bloco tiver downsample, aplica só o downsample p/ manter shape)
+    """
+    def __init__(self, block, layers, num_classes=10):
+        super(ResNetMasked, self).__init__()
+        self.inplanes = 16
+        self.conv1 = conv3x3(3, 16)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.relu = nn.ReLU(inplace=True)
+
+        # 3 grupos, agora como ModuleList p/ controle fino
+        self.layer1 = self._make_layer(block, 16, layers[0])
+        self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
+        self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
+
+        self.avgpool = nn.AvgPool2d(8)
+        self.fc = nn.Linear(64 * block.expansion, num_classes)
+
+        # máscara padrão = "executa tudo"
+        total_blocks = len(self.layer1) + len(self.layer2) + len(self.layer3)
+        mask_init = torch.ones(total_blocks, dtype=torch.uint8)
+        self.register_buffer("mask_bits", mask_init)  # fica no device do modelo
+
+        # init igual ao da ResNet original
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                with torch.no_grad():
+                    m.weight.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                with torch.no_grad():
+                    m.weight.fill_(1)
+                    m.bias.zero_()
+            elif isinstance(m, nn.Linear):
+                n = m.weight.size(0) * m.weight.size(1)
+                with torch.no_grad():
+                    m.weight.normal_(0, math.sqrt(2. / n))
+                    # sem bias.zero_() aqui na versão original, mas ok manter
+
+    def _make_layer(self, block, planes, blocks, stride=1):
+        downsample = None
+        if stride != 1 or self.inplanes != planes * block.expansion:
+            downsample = nn.Sequential(
+                nn.Conv2d(self.inplanes, planes * block.expansion,
+                          kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes * block.expansion),
+            )
+        layers = []
+        layers.append(block(self.inplanes, planes, stride, downsample))
+        self.inplanes = planes * block.expansion
+        for _ in range(1, blocks):
+            layers.append(block(self.inplanes, planes))
+        return nn.ModuleList(layers)
+
+    @torch.no_grad()
+    def set_mask(self, mask_list):
+        """
+        Define a máscara fixa (lista/tupla de 0/1) p/ treino/inferência.
+        Tamanho esperado (ResNet-38): 18 (6+6+6).
+        """
+        m = torch.as_tensor(mask_list, dtype=torch.uint8, device=self.mask_bits.device)
+        if m.numel() != self.mask_bits.numel():
+            raise ValueError(f"Máscara com {m.numel()} bits; esperado {self.mask_bits.numel()}.")
+        self.mask_bits.copy_(m)
+
+    def _forward_group(self, x, layers, mask_group):
+        # percorre blocos aplicando ou não
+        for block, bit in zip(layers, mask_group):
+            if bit == 1:
+                x = block(x)
+            else:
+                # pular bloco: se houver downsample, aplica só ele p/ casar shape
+                if getattr(block, "downsample", None) is not None:
+                    x = block.downsample(x)
+                # senão, identidade (x inalterado)
+        return x
+
+    def forward(self, x):
+        x = self.conv1(x); x = self.bn1(x); x = self.relu(x)
+
+        n1, n2, n3 = len(self.layer1), len(self.layer2), len(self.layer3)
+        m = self.mask_bits
+        x = self._forward_group(x, self.layer1, m[0:n1])
+        x = self._forward_group(x, self.layer2, m[n1:n1+n2])
+        x = self._forward_group(x, self.layer3, m[n1+n2:n1+n2+n3])
+
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+# fábrica p/ CIFAR-10
+def cifar10_resnet_38_masked(pretrained=False, **kwargs):
+    return ResNetMasked(BasicBlock, [6, 6, 6], num_classes=10)
 
 ########################################
 # SkipNet+SP with Feedforward Gate     #
