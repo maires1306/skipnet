@@ -23,7 +23,7 @@ model_names = sorted(name for name in models.__dict__
 
 def parse_args():
     # hyper-parameters are from ResNet paper
-    parser = argparse.ArgumentParser(description='PyTorch CIFAR10 training')
+    parser = argparse.ArgumentParser(description='PyTorch CIFAR/SVHN training (no routing)')
     parser.add_argument('cmd', choices=['train', 'test'])
     parser.add_argument('arch', metavar='ARCH', default='cifar10_resnet_110',
                         choices=model_names,
@@ -31,10 +31,10 @@ def parse_args():
                              ' | '.join(model_names) +
                              ' (default: cifar10_resnet_110)')
     parser.add_argument('--dataset', '-d', type=str, default='cifar10',
-                        choices=['cifar10', 'cifar100'],
+                        choices=['cifar10', 'cifar100', 'svhn'],
                         help='dataset choice')
     parser.add_argument('--workers', default=8, type=int, metavar='N',
-                        help='number of data loading workers (default: 4 )')
+                        help='number of data loading workers (default: 8)')
     parser.add_argument('--iters', default=64000, type=int,
                         help='number of total iterations (default: 64,000)')
     parser.add_argument('--start-iter', default=0, type=int,
@@ -50,14 +50,13 @@ def parse_args():
     parser.add_argument('--print-freq', default=10, type=int,
                         help='print frequency (default: 10)')
     parser.add_argument('--resume', default='', type=str,
-                        help='path to  latest checkpoint (default: None)')
+                        help='path to latest checkpoint (default: None)')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                         help='use pretrained model')
     parser.add_argument('--step-ratio', default=0.1, type=float,
                         help='ratio for learning rate deduction')
     parser.add_argument('--warm-up', action='store_true',
-                        help='for n = 18, the model needs to warm up for 400 '
-                             'iterations')
+                        help='for n = 18, the model needs to warm up for 400 iterations')
     parser.add_argument('--save-folder', default='save_checkpoints/', type=str,
                         help='folder to save the checkpoints')
     parser.add_argument('--eval-every', default=1000, type=int,
@@ -110,7 +109,8 @@ def run_training(args):
         else:
             logging.info('=> no checkpoint found at `{}`'.format(args.resume))
 
-    cudnn.benchmark = False
+    # inputs 32x32 => benchmark ajuda performance
+    cudnn.benchmark = True
 
     train_loader = prepare_train_data(dataset=args.dataset,
                                       batch_size=args.batch_size,
@@ -178,7 +178,7 @@ def run_training(args):
                             top1=top1)
             )
 
-        # evaluate every 1000 steps
+        # evaluate every eval_every steps
         if (i % args.eval_every == 0 and i > 0) or (i == args.iters - 1):
             prec1 = validate(args, test_loader, model, criterion)
             is_best = prec1 > best_prec1
@@ -251,7 +251,7 @@ def test_model(args):
         else:
             logging.info('=> no checkpoint found at `{}`'.format(args.resume))
 
-    cudnn.benchmark = False
+    cudnn.benchmark = True
     test_loader = prepare_test_data(dataset=args.dataset,
                                     batch_size=args.batch_size,
                                     shuffle=False,
@@ -313,7 +313,8 @@ def accuracy(output, target, topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        # reshape para versões recentes do PyTorch
+        correct_k = correct[:k].reshape(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
