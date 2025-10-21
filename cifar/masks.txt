@@ -57,3 +57,4 @@
 
 # 20. padrão cruzado (primeiro e último de cada grupo)
 1 0 0 0 0 1  1 0 0 0 0 1  1 0 0 0 0 1
+
