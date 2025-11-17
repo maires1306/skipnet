@@ -118,6 +118,22 @@ def cifar10_resnet_110(pretrained=False, **kwargs):
     model = ResNet(BasicBlock, [18, 18, 18], **kwargs)
     return model
 
+# For CIFAR-100
+# ResNet-38
+def cifar100_resnet_38(pretrained=False, **kwargs):
+    # n = 6
+    model = ResNet(BasicBlock, [6, 6, 6], num_classes=100, **kwargs)
+    return model
+
+# (opcionais, se você quiser usar também)
+def cifar100_resnet_74(pretrained=False, **kwargs):
+    model = ResNet(BasicBlock, [12, 12, 12], num_classes=100, **kwargs)
+    return model
+
+def cifar100_resnet_110(pretrained=False, **kwargs):
+    model = ResNet(BasicBlock, [18, 18, 18], num_classes=100, **kwargs)
+    return model
+
 ########################################
 # ResNet com máscara manual (inference)
 ########################################
@@ -289,6 +305,9 @@ class ResNetMasked(nn.Module):
 # fábrica p/ CIFAR-10
 def cifar10_resnet_38_masked(pretrained=False, **kwargs):
     return ResNetMasked(BasicBlock, [6, 6, 6], num_classes=10)
+
+def cifar100_resnet_38_masked(pretrained=False, **kwargs):
+    return ResNetMasked(BasicBlock, [6, 6, 6], num_classes=100)
 
 ########################################
 # SkipNet+SP with Feedforward Gate     #

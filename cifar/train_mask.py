@@ -12,7 +12,8 @@ import torch.backends.cudnn as cudnn
 import torchvision
 import torchvision.transforms as transforms
 
-from models import cifar10_resnet_38_masked  # usa a mesma arquitetura (10 classes, 32x32)
+from models import cifar10_resnet_38_masked, cifar100_resnet_38_masked
+
 # Se preferir usar seus loaders prontos:
 # from data import prepare_train_data, prepare_test_data
 
@@ -127,8 +128,8 @@ def validate(model, loader, criterion, device):
 def main():
     parser = argparse.ArgumentParser("Fine-tune ResNet-38 masked (sweep)")
     parser.add_argument("--save-folder", default="save_mask_sweep", type=str)
-    parser.add_argument("--baseline-ckpt", default="save_checkpoints/cifar10_resnet_38/model_best.pth.tar", type=str)
-    parser.add_argument("--dataset", default="cifar10", choices=["cifar10", "svhn"], type=str)
+    parser.add_argument("--baseline-ckpt", default="", type=str, help="checkpoint do baseline")
+    parser.add_argument("--dataset", default="cifar10", choices=["cifar10", "cifar100", "svhn"], type=str)
     parser.add_argument("--batch-size", default=128, type=int)
     parser.add_argument("--epochs", default=10, type=int)
     parser.add_argument("--lr", default=1e-2, type=float)
@@ -165,6 +166,26 @@ def main():
             root="./data", train=False, download=True, transform=transform_test
         )
 
+    elif args.dataset == "cifar100":
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408),
+                                 (0.2675, 0.2565, 0.2761)),
+        ])
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5071, 0.4867, 0.4408),
+                                 (0.2675, 0.2565, 0.2761)),
+        ])
+        trainset = torchvision.datasets.CIFAR100(
+            root="./data", train=True, download=True, transform=transform_train
+        )
+        testset = torchvision.datasets.CIFAR100(
+            root="./data", train=False, download=True, transform=transform_test
+        )
+
     elif args.dataset == "svhn":
         # SVHN: 32x32 RGB, 10 classes; evitar flip horizontal (dígitos!)
         transform_train = transforms.Compose([
@@ -198,7 +219,13 @@ def main():
     )
 
     # --------- Modelo base + carregar baseline ---------
-    model = cifar10_resnet_38_masked().to(device)  # serve para CIFAR-10 e SVHN (10 classes)
+    if args.dataset in ["cifar10", "svhn"]:
+        model = cifar10_resnet_38_masked().to(device)   # 10 classes
+    elif args.dataset == "cifar100":
+        model = cifar100_resnet_38_masked().to(device)  # 100 classes
+    else:
+        raise ValueError(f"Dataset não suportado: {args.dataset}")
+
     _ = load_baseline_weights_flexible(model, args.baseline_ckpt, device)
 
     total_blocks = 18  # ResNet-38 CIFAR: 6+6+6
